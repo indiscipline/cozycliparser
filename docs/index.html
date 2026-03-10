@@ -108,8 +108,8 @@
   errorStream*: OutStream = osStderr
   fmtIndent*: int = 2
   fmtColSep*: int = 2        ## minimal help text alignment shift
-  palette*: HelpPalette = [(fgDefault, {}), (fgDefault, {styleBright}),
-                           (fgDefault, {styleDim}), (fgCyan, {styleBright}),
+  palette*: HelpPalette = [(fgDefault, {}), (fgDefault, {}),
+                           (fgYellow, {styleDim}), (fgCyan, {styleBright}),
                            (fgCyan, {}), (fgGreen, {styleBright}),
                            (fgBlue, {styleBright}), (fgMagenta, {styleBright})]
   debug*: bool = false       ## print the expanded macro AST at compile time">ParserConfig</a></li>
@@ -130,10 +130,9 @@
   <details open>
     <summary><a class="reference reference-toplevel" href="#10" id="60">Consts</a></summary>
     <ul class="simple simple-toc-section">
-      <li><a class="reference" href="#DefaultPalette" title="DefaultPalette: HelpPalette = [(fgDefault, {}), (fgDefault, {styleBright}),
-                               (fgDefault, {styleDim}),
-                               (fgCyan, {styleBright}), (fgCyan, {}),
-                               (fgGreen, {styleBright}),
+      <li><a class="reference" href="#DefaultPalette" title="DefaultPalette: HelpPalette = [(fgDefault, {}), (fgDefault, {}),
+                               (fgYellow, {styleDim}), (fgCyan, {styleBright}),
+                               (fgCyan, {}), (fgGreen, {styleBright}),
                                (fgBlue, {styleBright}),
                                (fgMagenta, {styleBright})]">DefaultPalette</a></li>
 
@@ -178,9 +177,8 @@
             helpText = &quot;Show this help and exit&quot;; helpStream = osStdout;
             helpExitCode = 0; useColors = true; errorExitCode = 1;
             errorShowHelp = true; errorStream = osStderr; fmtIndent = 2;
-            fmtColSep = 2; palette = [(fgDefault, {}),
-                                      (fgDefault, {styleBright}),
-                                      (fgDefault, {styleDim}),
+            fmtColSep = 2; palette = [(fgDefault, {}), (fgDefault, {}),
+                                      (fgYellow, {styleDim}),
                                       (fgCyan, {styleBright}), (fgCyan, {}),
                                       (fgGreen, {styleBright}),
                                       (fgBlue, {styleBright}),
@@ -188,9 +186,8 @@
             helpText = &quot;Show this help and exit&quot;; helpStream = osStdout;
             helpExitCode = 0; useColors = true; errorExitCode = 1;
             errorShowHelp = true; errorStream = osStderr; fmtIndent = 2;
-            fmtColSep = 2; palette = [(fgDefault, {}),
-                                      (fgDefault, {styleBright}),
-                                      (fgDefault, {styleDim}),
+            fmtColSep = 2; palette = [(fgDefault, {}), (fgDefault, {}),
+                                      (fgYellow, {styleDim}),
                                       (fgCyan, {styleBright}), (fgCyan, {}),
                                       (fgGreen, {styleBright}),
                                       (fgBlue, {styleBright}),
@@ -554,8 +551,8 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
   <span class="Identifier">errorStream</span><span class="Operator">*</span><span class="Other">:</span> <a href="cozycliparser.html#OutStream"><span class="Identifier">OutStream</span></a> <span class="Other">=</span> <span class="DecNumber">osStderr</span>
   <span class="Identifier">fmtIndent</span><span class="Operator">*</span><span class="Other">:</span> <span class="Identifier">int</span> <span class="Other">=</span> <span class="DecNumber">2</span>
   <span class="Identifier">fmtColSep</span><span class="Operator">*</span><span class="Other">:</span> <span class="Identifier">int</span> <span class="Other">=</span> <span class="DecNumber">2</span>        <span class="Comment">## minimal help text alignment shift</span>
-  <span class="Identifier">palette</span><span class="Operator">*</span><span class="Other">:</span> <a href="cozycliparser.html#HelpPalette"><span class="Identifier">HelpPalette</span></a> <span class="Other">=</span> <span class="Other">[</span><span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
-                           <span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleDim</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
+  <span class="Identifier">palette</span><span class="Operator">*</span><span class="Other">:</span> <a href="cozycliparser.html#HelpPalette"><span class="Identifier">HelpPalette</span></a> <span class="Other">=</span> <span class="Other">[</span><span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
+                           <span class="Other">(</span><span class="DecNumber">fgYellow</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleDim</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
                            <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgGreen</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
                            <span class="Other">(</span><span class="DecNumber">fgBlue</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgMagenta</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">]</span>
   <span class="Identifier">debug</span><span class="Operator">*</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other">=</span> <span class="DecNumber">false</span>       <span class="Comment">## print the expanded macro AST at compile time</span></pre></dt>
@@ -566,9 +563,8 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
             helpText = &quot;Show this help and exit&quot;; helpStream = osStdout;
             helpExitCode = 0; useColors = true; errorExitCode = 1;
             errorShowHelp = true; errorStream = osStderr; fmtIndent = 2;
-            fmtColSep = 2; palette = [(fgDefault, {}),
-                                      (fgDefault, {styleBright}),
-                                      (fgDefault, {styleDim}),
+            fmtColSep = 2; palette = [(fgDefault, {}), (fgDefault, {}),
+                                      (fgYellow, {styleDim}),
                                       (fgCyan, {styleBright}), (fgCyan, {}),
                                       (fgGreen, {styleBright}),
                                       (fgBlue, {styleBright}),
@@ -597,10 +593,9 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
   <h1><a class="toc-backref" href="#10">Consts</a></h1>
   <dl class="item">
     <div id="DefaultPalette">
-  <dt><pre><a href="cozycliparser.html#DefaultPalette"><span class="Identifier">DefaultPalette</span></a><span class="Other">:</span> <a href="cozycliparser.html#HelpPalette"><span class="Identifier">HelpPalette</span></a> <span class="Other">=</span> <span class="Other">[</span><span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
-                               <span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleDim</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
-                               <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
-                               <span class="Other">(</span><span class="DecNumber">fgGreen</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
+  <dt><pre><a href="cozycliparser.html#DefaultPalette"><span class="Identifier">DefaultPalette</span></a><span class="Other">:</span> <a href="cozycliparser.html#HelpPalette"><span class="Identifier">HelpPalette</span></a> <span class="Other">=</span> <span class="Other">[</span><span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
+                               <span class="Other">(</span><span class="DecNumber">fgYellow</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleDim</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
+                               <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgGreen</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
                                <span class="Other">(</span><span class="DecNumber">fgBlue</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
                                <span class="Other">(</span><span class="DecNumber">fgMagenta</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">]</span></pre></dt>
   <dd>
@@ -727,11 +722,11 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
                  <span class="Identifier">helpText</span> <span class="Other">=</span> <span class="StringLit">&quot;Show this help and exit&quot;</span><span class="Other">;</span> <span class="Identifier">helpStream</span> <span class="Other">=</span> <span class="DecNumber">osStdout</span><span class="Other">;</span>
                  <span class="Identifier">helpExitCode</span> <span class="Other">=</span> <span class="DecNumber">0</span><span class="Other">;</span> <span class="Identifier">useColors</span> <span class="Other">=</span> <span class="Identifier">true</span><span class="Other">;</span> <span class="Identifier">errorExitCode</span> <span class="Other">=</span> <span class="DecNumber">1</span><span class="Other">;</span>
                  <span class="Identifier">errorShowHelp</span> <span class="Other">=</span> <span class="Identifier">true</span><span class="Other">;</span> <span class="Identifier">errorStream</span> <span class="Other">=</span> <span class="DecNumber">osStderr</span><span class="Other">;</span> <span class="Identifier">fmtIndent</span> <span class="Other">=</span> <span class="DecNumber">2</span><span class="Other">;</span>
-                 <span class="Identifier">fmtColSep</span> <span class="Other">=</span> <span class="DecNumber">2</span><span class="Other">;</span> <span class="Identifier">palette</span> <span class="Other">=</span> <span class="Other">[</span><span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
-    <span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleDim</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
-    <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgGreen</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
-    <span class="Other">(</span><span class="DecNumber">fgBlue</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgMagenta</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">debug</span> <span class="Other">=</span> <span class="Identifier">false</span><span class="Other">)</span><span class="Other">:</span> <a href="cozycliparser.html#ParserConfig"><span class="Identifier">ParserConfig</span></a> {.
-    <span class="Identifier">compiletime</span><span class="Other">,</span> <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+                 <span class="Identifier">fmtColSep</span> <span class="Other">=</span> <span class="DecNumber">2</span><span class="Other">;</span> <span class="Identifier">palette</span> <span class="Other">=</span> <span class="Other">[</span><span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
+    <span class="Other">(</span><span class="DecNumber">fgYellow</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleDim</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
+    <span class="Other">(</span><span class="DecNumber">fgGreen</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgBlue</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
+    <span class="Other">(</span><span class="DecNumber">fgMagenta</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">debug</span> <span class="Other">=</span> <span class="Identifier">false</span><span class="Other">)</span><span class="Other">:</span> <a href="cozycliparser.html#ParserConfig"><span class="Identifier">ParserConfig</span></a> {.<span class="Identifier">compiletime</span><span class="Other">,</span>
+    <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
     
@@ -859,7 +854,7 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2026-03-10 02:14:09 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2026-03-10 17:08:44 UTC</small>
       </div>
     </div>
   </div>
