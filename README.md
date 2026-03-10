@@ -16,10 +16,6 @@ from a set of regular, fully type-checked procedure calls and option-handling cl
 - Slim code, no dependencies beyond `std/[parseopt, strutils, terminal, envvars]`.
 - Colorized help strings.
 
-## Documentation
-The rendered API documentation and detailed guides are located in the `docs`
-directory and should be available online at indiscipline.github.io/cozycliparser.
-
 ## Installation
 Cozy CLI Parser is in the nimble directory, use `atlas` or `nimble` to install:
 
@@ -31,7 +27,12 @@ atlas use cozycliparser
 nimble install cozycliparser
 ```
 
-## Usage
+## Documentation
+The rendered API documentation and detailed guides are located in the `docs`
+directory and are available online at
+[indiscipline.github.io/cozycliparser](https://indiscipline.github.io/cozycliparser).
+
+## Usage example
 
 Call `macro buildParser` with a program name, a help namespace name, a parser
 mode, and a declarative body. The `opt`, `flag`, `arg` and `cmd` routines
@@ -91,9 +92,11 @@ Cli.greet.help.display()
 ```
 <!-- EXAMPLE_END -->
 
-
 *By default, a `-h`/`--help` flag is auto-injected at every parser level,
 providing styled, nested help outputs natively.*
+
+See [module documentation](https://indiscipline.github.io/cozycliparser) for
+details and many more examples.
 
 ## TODO:
 
@@ -101,7 +104,7 @@ providing styled, nested help outputs natively.*
 
 ## Contributing
 The project is open for contributions.
-Simplifying and reducing loc is preferable to expanding the featureset.
+Simplifying and reducing loc is preferable to expanding the feature set.
 
 **Important:** In order to facilitate possible standard library inclusion,
 all contributors must agree to the [Contributor License Agreement (CLA)](CLA.md).
@@ -114,4 +117,4 @@ inclusion into the official Nim Standard Library.
 
 ## License
 Cozy CLI Parser is licensed under GNU General Public License version 2.0 or later.
-See `LICENSE` for full details.
+See [`LICENSE`](LICENSE) for full details.
