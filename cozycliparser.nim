@@ -275,8 +275,8 @@ type
 
 const DefaultPalette*: HelpPalette = [
   htPlain:    (fgDefault, {}),
-  htProgName: (fgDefault, {styleBright}),
-  htSection:  (fgDefault, {styleDim}),
+  htProgName: (fgDefault, {}),
+  htSection:  (fgYellow, {styleDim}),
   htArg:      (fgCyan, {styleBright}),
   htMetavar:  (fgCyan, {}),
   htShortKey: (fgGreen, {styleBright}),
@@ -305,10 +305,10 @@ proc display*(doc: HelpText; palette: HelpPalette; f: File = stdout) =
     f.write(doc)
   else:
     for span in doc:
-      case span.tag
-      of htPlain: f.write(span.text)
+      let (fg, style) = palette[span.tag]
+      if fg == fgDefault and style == {}:
+        f.write(span.text)
       else:
-        let (fg, style) = palette[span.tag]
         f.styledWrite(style, fg, span.text)
   f.write('\n')
     
