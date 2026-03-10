@@ -84,8 +84,8 @@ Options:
 ##    By default (`ParserConfig.helpAuto = true`), a `-h`/`--help` flag is
 ##    auto-injected at every parser level, writing help to `stdout` and
 ##    calling `quit(0)`. Registering a flag that conflicts with the configured
-##    short or long form at a given level suppresses auto-injection there,
-##    leaving full control to the user-provided handler.
+##    short or long key at a given level suppresses that key or whole
+##    auto-injection (if both were shadowed) with a hint or a warning.
 ##
 ## `buildParser` injects a single name into the outer scope:
 ##
@@ -187,7 +187,7 @@ runnableExamples("-r:off"):
       cmd: Cmd
       filterCol, filterRe: string
 
-  var options: Options
+  var options = Options()
   buildParser("csvtool", "Cli", GnuMode):
     cmd("filter", "Filter rows by column value") do ():
       arg("COLUMN", "Column name") do (val: string):
@@ -202,6 +202,43 @@ runnableExamples("-r:off"):
     of cmdNone:
       display(Cli.help); quit(1) # show help and signal error
 ##
+## Default values
+## --------------
+##
+## No built-in support for default options values is provided.
+## However, Nim's [default values for object fields](https://nim-lang.org/docs/manual.html#types-default-values-for-object-fields) 
+## enable this convenient pattern:
+runnableExamples("-r:off"):
+  from std/strutils import parseInt
+
+  # Define default constants to use in help text that must be statically known
+  const
+    DefWidth = 2
+    DefHeight = 21
+
+  # Set object field defaults
+  type Options = object
+    width: int = DefWidth
+    height: int = DefHeight
+
+  proc validateNum(s: string): Natural =
+    try:
+      let i = parseInt(s) # raises ValueError on wrong input
+      if i notin 0..100:
+        raise newException(ValueError,
+          "Value not in a valid range [0..100]:" & $i)
+    except ValueError as e: quit("Error: " & e.msg, 1)
+
+  var options = Options()
+  buildParser("multiplier", "Cli", NimMode):
+    opt('w', "width", "Width value. Default=" & $DefWidth, "W") do (n: string):
+      options.width = validateNum(n)
+    opt('h', "height", "Height value. Default=" & $DefHeight, "H") do (n: string):
+      # `h` suppresses the short key for auto-injected help and a hint will be shown
+      options.height = validateNum(n)
+
+  echo options.width * options.height  
+## 
 ## Error handling
 ## --------------
 ##
@@ -393,6 +430,24 @@ type
     metavar: string
     absIdx: int ## absolute index into bpCtx.handlers; set during extractScope
 
+  ScopePath = seq[string]
+
+  CmdSpec = object
+    name: string ## token matched on the command line
+    help: string
+    procName: string ## generated proc name: name & "Cmd"
+    scope: Scope
+
+  Scope = ref object
+    ## Compile-time metadata for one parser level (root or subcommand).
+    progName: string    ## top-level program name, unchanged at every level
+    path: ScopePath     ## subcommand chain: @[] at root, @["a","b"] deeper
+    specs: seq[OptSpec] ## opt/flag/arg/run registrations at this level
+    cmds: seq[CmdSpec]  ## subcommand registrations at this level
+    autoHelp: OptSpec   ## injected help flag; kind == okFlag signals presence
+    argIdxs: seq[int]   ## absolute bpCtx.handlers indexes of arg handlers, in order
+    runIdx: int = -1    ## absolute bpCtx.handlers index of the run handler, or -1
+
   OptHandler* = proc (val: string) {.closure.}
   FlagHandler* = proc () {.closure.}
   ArgHandler* = proc (key: string) {.closure.}
@@ -494,7 +549,7 @@ proc cmd*(name, help: string; cmdRegistrations: proc ()) =
   # to the generated `<name>Cmd(remainingArgs)` proc with its own parser loop.
   cmdRegistrations()
 
-template command(name, help: string, body: untyped) =
+template command*(name, help: string, body: untyped) =
   cmd(name, help, proc() = body)
 
 proc onError*(handler: ErrorHandler) =
@@ -506,27 +561,10 @@ proc onError*(handler: ErrorHandler) =
   ## to `stderr`, then exits with code 1.
   bpCtx.onError = handler
 
-type
-  ScopePath = seq[string]
-
-  Scope = ref object
-    ## Compile-time metadata for one parser level (root or subcommand).
-    progName: string        ## top-level program name, unchanged at every level
-    path: ScopePath     ## subcommand chain: @[] at root, @["a","b"] deeper
-    specs: seq[OptSpec]  ## opt/flag/arg/run registrations at this level
-    cmds: seq[CmdSpec]  ## subcommand registrations at this level
-    autoHelp: OptSpec       ## injected help flag; kind == okFlag signals presence
-    argIdxs: seq[int]      ## absolute bpCtx.handlers indexes of arg handlers, in order
-    runIdx: int = -1      ## absolute bpCtx.handlers index of the run handler, or -1
-
-  CmdSpec = object
-    name: string ## token matched on the command line
-    help: string
-    procName: string ## generated proc name: name & "Cmd"
-    scope: Scope
-
-func hasShort(s: OptSpec): bool {.inline.} = s.short.ord >= 32
-func hasLong(s: OptSpec): bool {.inline.} = s.name.len > 0
+template keyOk(c: char): bool = c.ord >= 32
+template keyOk(s: openArray[char]): bool = s.len > 0
+template hasShort(s: OptSpec): bool = s.short.keyOk()
+template hasLong(s: OptSpec): bool = s.name.keyOk()
 proc addStr(dest: var string; parts: varargs[string]) {.inline.}=
   for p in parts: dest.add p
 
@@ -637,15 +675,29 @@ func generateHelp(s: Scope; cfg: ParserConfig): HelpText =
   generateHelp(cfg.helpPrefix, cmd, s.specs, s.cmds, s.autoHelp,
                cfg.fmtIndent, cfg.fmtColSep)
 
-proc injectAutoHelp(scope: Scope; cfg: ParserConfig) =
+proc injectAutoHelp(scope: Scope; cfg: ParserConfig;
+                    shortOverridden, longOverridden: bool;
+                    conflictNode: NimNode) =
+  ## Injects the auto-help flag into `scope`, suppressing only the keys that
+  ## were overridden by a user-registered opt/flag.
   let (hShort, hLong) = cfg.helpFlag
-  for s in scope.specs:
-    if s.kind == okFlag and
-       ((hShort.ord >= 32 and s.short == hShort) or
-        (hLong.len > 0 and s.name == hLong)):
-      return
-  scope.autoHelp = OptSpec(kind: okFlag, short: hShort, name: hLong,
-                           help: cfg.helpText)
+  let (hasShort, hasLong) = (keyOk(hShort), keyOk(hLong))
+  let allOverridden = (not hasShort or shortOverridden) and
+                      (not hasLong  or longOverridden)
+  if allOverridden:
+    warning("buildParser: all help keys are shadowed by user-defined flags. " &
+            "Auto-help suppressed at this parser level", conflictNode)
+    return
+  if shortOverridden:
+    hint("buildParser: short help key '-" & $hShort & "' is shadowed by a " &
+         "user-defined flag.", conflictNode)
+  elif longOverridden:
+    hint("buildParser: long help key '--" & hLong & "' is shadowed by a " &
+         "user-defined flag.", conflictNode)
+  scope.autoHelp = OptSpec(kind: okFlag,
+                           short: if shortOverridden: '\0' else: hShort,
+                           name:  if longOverridden:  ""   else: hLong,
+                           help:  cfg.helpText)
 
 proc extractScope(progName: string; body: NimNode; cfg: ParserConfig;
                   path: ScopePath; baseIdx: int): tuple[s: Scope, next: int] =
@@ -662,6 +714,10 @@ proc extractScope(progName: string; body: NimNode; cfg: ParserConfig;
     if s.kind == nnkStmtList:
       for inner in s: stmts.add inner
     else: stmts.add s
+
+  let (hShort, hLong) = cfg.helpFlag
+  var shortOverridden, longOverridden = false
+  var conflictNode: NimNode = nil
 
   for stmt in stmts:
     if stmt.kind in {nnkCommentStmt, nnkEmpty}: continue
@@ -680,6 +736,14 @@ proc extractScope(progName: string; body: NimNode; cfg: ParserConfig;
         absIdx: baseIdx + next)
       if not spec.hasShort and not spec.hasLong:
         error(callee & ": must have at least one of a short or long form", stmt)
+      # Check for conflicts with the auto-injected help flag while the
+      if cfg.helpAuto:
+        if spec.hasShort and keyOk(hShort) and spec.short == hShort:
+          shortOverridden = true
+          if conflictNode == nil: conflictNode = stmt
+        if spec.hasLong and keyOk(hLong) and spec.name == hLong:
+          longOverridden = true
+          if conflictNode == nil: conflictNode = stmt
       scope.specs.add spec
       inc next
     of "arg":
@@ -717,7 +781,7 @@ proc extractScope(progName: string; body: NimNode; cfg: ParserConfig;
       error("buildParser: unexpected call '" & callee & "' — only opt, " &
             "flag, arg, run and cmd are allowed in the parser body", stmt)
 
-  if cfg.helpAuto: scope.injectAutoHelp(cfg)
+  if cfg.helpAuto: scope.injectAutoHelp(cfg, shortOverridden, longOverridden, conflictNode)
   (scope, next)
 
 proc buildHelpNamespace(scope: Scope; typeName: NimNode; cfg: ParserConfig): NimNode =

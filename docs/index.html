@@ -56,6 +56,7 @@
 <li><a class="reference" id="cozycliparsercolon-commandminusline-parser-builder-accessing-help_toc" href="#cozycliparsercolon-commandminusline-parser-builder-accessing-help">Accessing help</a></li>
 <li><a class="reference" id="cozycliparsercolon-commandminusline-parser-builder-optional-short-slash-long-forms_toc" href="#cozycliparsercolon-commandminusline-parser-builder-optional-short-slash-long-forms">Optional short / long forms</a></li>
 <li><a class="reference" id="cozycliparsercolon-commandminusline-parser-builder-subcommands_toc" href="#cozycliparsercolon-commandminusline-parser-builder-subcommands">Subcommands</a></li>
+<li><a class="reference" id="cozycliparsercolon-commandminusline-parser-builder-default-values_toc" href="#cozycliparsercolon-commandminusline-parser-builder-default-values">Default values</a></li>
 <li><a class="reference" id="cozycliparsercolon-commandminusline-parser-builder-error-handling_toc" href="#cozycliparsercolon-commandminusline-parser-builder-error-handling">Error handling</a></li>
 <li><a class="reference" id="cozycliparsercolon-commandminusline-parser-builder-principle-of-operation_toc" href="#cozycliparsercolon-commandminusline-parser-builder-principle-of-operation">Principle of operation</a></li>
 </ul><li>
@@ -232,6 +233,10 @@
   <li><a class="reference" href="#buildParser.t%2Cstaticstring%2Cstaticstring%2CstaticCliMode%2Ctyped" title="buildParser(progName, helpName: static string; mode: static CliMode; body: typed): untyped">buildParser(progName, helpName: static string; mode: static CliMode; body: typed): untyped</a></li>
 
 </ul>
+<ul class="simple nested-toc-section">command
+  <li><a class="reference" href="#command.t%2Cstring%2Cstring%2Cuntyped" title="command(name, help: string; body: untyped)">command(name, help: string; body: untyped)</a></li>
+
+</ul>
 <ul class="simple nested-toc-section">flagreg
   <li><a class="reference" href="#flagreg.t%2Cchar%2Cstring%2Cstring%2Cstring%2Cuntyped" title="flagreg(short: char; name, help, metavar: string; body: untyped)">flagreg(short: char; name, help, metavar: string; body: untyped)</a></li>
 
@@ -320,7 +325,7 @@ Arguments:
 
 Options:
   -h, --help  Show this help and exit&quot;&quot;&quot;</span></pre><div class="admonition admonition-warning"><span class="admonition-warning-text"><b>Important:</b></span>
-By default (<tt class="docutils literal"><span class="pre"><span class="Identifier">ParserConfig</span><span class="Operator">.</span><span class="Identifier">helpAuto</span> <span class="Operator">=</span> <span class="Identifier">true</span></span></tt>), a <tt class="docutils literal"><span class="pre"><span class="Operator">-</span><span class="Identifier">h</span></span></tt>/<tt class="docutils literal"><span class="pre"><span class="Operator">--</span><span class="Identifier">help</span></span></tt> flag is auto-injected at every parser level, writing help to <tt class="docutils literal"><span class="pre"><span class="Identifier">stdout</span></span></tt> and calling <tt class="docutils literal"><span class="pre"><span class="Identifier">quit</span><span class="Punctuation">(</span><span class="DecNumber">0</span><span class="Punctuation">)</span></span></tt>. Registering a flag that conflicts with the configured short or long form at a given level suppresses auto-injection there, leaving full control to the user-provided handler.</div>
+By default (<tt class="docutils literal"><span class="pre"><span class="Identifier">ParserConfig</span><span class="Operator">.</span><span class="Identifier">helpAuto</span> <span class="Operator">=</span> <span class="Identifier">true</span></span></tt>), a <tt class="docutils literal"><span class="pre"><span class="Operator">-</span><span class="Identifier">h</span></span></tt>/<tt class="docutils literal"><span class="pre"><span class="Operator">--</span><span class="Identifier">help</span></span></tt> flag is auto-injected at every parser level, writing help to <tt class="docutils literal"><span class="pre"><span class="Identifier">stdout</span></span></tt> and calling <tt class="docutils literal"><span class="pre"><span class="Identifier">quit</span><span class="Punctuation">(</span><span class="DecNumber">0</span><span class="Punctuation">)</span></span></tt>. Registering a flag that conflicts with the configured short or long key at a given level suppresses that key or whole auto-injection (if both were shadowed) with a hint or a warning.</div>
 <p><tt class="docutils literal"><span class="pre"><span class="Identifier">buildParser</span></span></tt> injects a single name into the outer scope:</p>
 <ul class="simple"><li><tt class="docutils literal"><span class="pre"><span class="Keyword">const</span> <span class="Identifier">Cli</span></span></tt>: a zero-runtime-cost namespace of structured <tt class="docutils literal"><span class="pre"><span class="Identifier">HelpText</span></span></tt> values. Access as <tt class="docutils literal"><span class="pre"><span class="Identifier">Cli</span><span class="Operator">.</span><span class="Identifier">help</span></span></tt> (root) or <tt class="docutils literal"><span class="pre"><span class="Identifier">Cli</span><span class="Operator">.&lt;</span><span class="Identifier">subcmd</span><span class="Operator">&gt;.</span><span class="Identifier">help</span></span></tt>. Call <tt class="docutils literal"><span class="pre"><span class="Operator">$</span><span class="Identifier">Cli</span><span class="Operator">.</span><span class="Identifier">help</span></span></tt> for a plain string, or <tt class="docutils literal"><span class="pre"><span class="Identifier">Cli</span><span class="Operator">.</span><span class="Identifier">help</span><span class="Operator">.</span><span class="Identifier">display</span><span class="Punctuation">(</span><span class="Operator">&lt;</span><span class="Identifier">fd</span><span class="Operator">&gt;</span><span class="Punctuation">)</span></span></tt> for styled output.</li>
 </ul>
@@ -379,7 +384,7 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
     <span class="Identifier">cmd</span><span class="Punctuation">:</span> <span class="Identifier">Cmd</span>
     <span class="Identifier">filterCol</span><span class="Punctuation">,</span> <span class="Identifier">filterRe</span><span class="Punctuation">:</span> <span class="Identifier">string</span>
 
-<span class="Keyword">var</span> <span class="Identifier">options</span><span class="Punctuation">:</span> <span class="Identifier">Options</span>
+<span class="Keyword">var</span> <span class="Identifier">options</span> <span class="Operator">=</span> <span class="Identifier">Options</span><span class="Punctuation">(</span><span class="Punctuation">)</span>
 <span class="Identifier">buildParser</span><span class="Punctuation">(</span><span class="StringLit">&quot;csvtool&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;Cli&quot;</span><span class="Punctuation">,</span> <span class="Identifier">GnuMode</span><span class="Punctuation">)</span><span class="Punctuation">:</span>
   <span class="Identifier">cmd</span><span class="Punctuation">(</span><span class="StringLit">&quot;filter&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;Filter rows by column value&quot;</span><span class="Punctuation">)</span> <span class="Keyword">do</span> <span class="Punctuation">(</span><span class="Punctuation">)</span><span class="Punctuation">:</span>
     <span class="Identifier">arg</span><span class="Punctuation">(</span><span class="StringLit">&quot;COLUMN&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;Column name&quot;</span><span class="Punctuation">)</span> <span class="Keyword">do</span> <span class="Punctuation">(</span><span class="Identifier">val</span><span class="Punctuation">:</span> <span class="Identifier">string</span><span class="Punctuation">)</span><span class="Punctuation">:</span>
@@ -393,6 +398,39 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
     <span class="Identifier">echo</span> <span class="Identifier">options</span> <span class="Comment"># act on `options`</span>
   <span class="Keyword">of</span> <span class="Identifier">cmdNone</span><span class="Punctuation">:</span>
     <span class="Identifier">display</span><span class="Punctuation">(</span><span class="Identifier">Cli</span><span class="Operator">.</span><span class="Identifier">help</span><span class="Punctuation">)</span><span class="Punctuation">;</span> <span class="Identifier">quit</span><span class="Punctuation">(</span><span class="DecNumber">1</span><span class="Punctuation">)</span> <span class="Comment"># show help and signal error</span></pre>
+<h2><a class="toc-backref" id="cozycliparsercolon-commandminusline-parser-builder-default-values" href="#cozycliparsercolon-commandminusline-parser-builder-default-values">Default values</a></h2><p>No built-in support for default options values is provided. However, Nim's <a class="reference external" href="https://nim-lang.org/docs/manual.html#types-default-values-for-object-fields">default values for object fields</a> enable this convenient pattern:</p>
+
+<p><strong class="examples_text">Example: cmd: -r:off</strong></p>
+<pre class="listing"><span class="Keyword">import</span> <span class="Identifier">cozycliparser</span>
+<span class="Keyword">from</span> <span class="Identifier">std</span><span class="Operator">/</span><span class="Identifier">strutils</span> <span class="Keyword">import</span> <span class="Identifier">parseInt</span>
+
+<span class="Comment"># Define default constants to use in help text that must be statically known</span>
+<span class="Keyword">const</span>
+  <span class="Identifier">DefWidth</span> <span class="Operator">=</span> <span class="DecNumber">2</span>
+  <span class="Identifier">DefHeight</span> <span class="Operator">=</span> <span class="DecNumber">21</span>
+
+<span class="Comment"># Set object field defaults</span>
+<span class="Keyword">type</span> <span class="Identifier">Options</span> <span class="Operator">=</span> <span class="Keyword">object</span>
+  <span class="Identifier">width</span><span class="Punctuation">:</span> <span class="Identifier">int</span> <span class="Operator">=</span> <span class="Identifier">DefWidth</span>
+  <span class="Identifier">height</span><span class="Punctuation">:</span> <span class="Identifier">int</span> <span class="Operator">=</span> <span class="Identifier">DefHeight</span>
+
+<span class="Keyword">proc</span> <span class="Identifier">validateNum</span><span class="Punctuation">(</span><span class="Identifier">s</span><span class="Punctuation">:</span> <span class="Identifier">string</span><span class="Punctuation">)</span><span class="Punctuation">:</span> <span class="Identifier">Natural</span> <span class="Operator">=</span>
+  <span class="Keyword">try</span><span class="Punctuation">:</span>
+    <span class="Keyword">let</span> <span class="Identifier">i</span> <span class="Operator">=</span> <span class="Identifier">parseInt</span><span class="Punctuation">(</span><span class="Identifier">s</span><span class="Punctuation">)</span> <span class="Comment"># raises ValueError on wrong input</span>
+    <span class="Keyword">if</span> <span class="Identifier">i</span> <span class="Keyword">notin</span> <span class="FloatNumber">0.</span><span class="Operator">.</span><span class="DecNumber">100</span><span class="Punctuation">:</span>
+      <span class="Keyword">raise</span> <span class="Identifier">newException</span><span class="Punctuation">(</span><span class="Identifier">ValueError</span><span class="Punctuation">,</span>
+        <span class="StringLit">&quot;Value not in a valid range [0..100]:&quot;</span> <span class="Operator">&amp;</span> <span class="Operator">$</span><span class="Identifier">i</span><span class="Punctuation">)</span>
+  <span class="Keyword">except</span> <span class="Identifier">ValueError</span> <span class="Keyword">as</span> <span class="Identifier">e</span><span class="Punctuation">:</span> <span class="Identifier">quit</span><span class="Punctuation">(</span><span class="StringLit">&quot;Error: &quot;</span> <span class="Operator">&amp;</span> <span class="Identifier">e</span><span class="Operator">.</span><span class="Identifier">msg</span><span class="Punctuation">,</span> <span class="DecNumber">1</span><span class="Punctuation">)</span>
+
+<span class="Keyword">var</span> <span class="Identifier">options</span> <span class="Operator">=</span> <span class="Identifier">Options</span><span class="Punctuation">(</span><span class="Punctuation">)</span>
+<span class="Identifier">buildParser</span><span class="Punctuation">(</span><span class="StringLit">&quot;multiplier&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;Cli&quot;</span><span class="Punctuation">,</span> <span class="Identifier">NimMode</span><span class="Punctuation">)</span><span class="Punctuation">:</span>
+  <span class="Identifier">opt</span><span class="Punctuation">(</span><span class="Punctuation">'</span><span class="Identifier">w</span><span class="CharLit">', &quot;width&quot;, &quot;Width value. Default=&quot; &amp; $DefWidth, &quot;W&quot;) do (n: string):</span>
+    <span class="Identifier">options</span><span class="Operator">.</span><span class="Identifier">width</span> <span class="Operator">=</span> <span class="Identifier">validateNum</span><span class="Punctuation">(</span><span class="Identifier">n</span><span class="Punctuation">)</span>
+  <span class="Identifier">opt</span><span class="Punctuation">(</span><span class="Punctuation">'</span><span class="Identifier">h</span><span class="CharLit">', &quot;height&quot;, &quot;Height value. Default=&quot; &amp; $DefHeight, &quot;H&quot;) do (n: string):</span>
+    <span class="Comment"># `h` suppresses the short key for auto-injected help and a hint will be shown</span>
+    <span class="Identifier">options</span><span class="Operator">.</span><span class="Identifier">height</span> <span class="Operator">=</span> <span class="Identifier">validateNum</span><span class="Punctuation">(</span><span class="Identifier">n</span><span class="Punctuation">)</span>
+
+<span class="Identifier">echo</span> <span class="Identifier">options</span><span class="Operator">.</span><span class="Identifier">width</span> <span class="Operator">*</span> <span class="Identifier">options</span><span class="Operator">.</span><span class="Identifier">height</span>  </pre>
 <h2><a class="toc-backref" id="cozycliparsercolon-commandminusline-parser-builder-error-handling" href="#cozycliparsercolon-commandminusline-parser-builder-error-handling">Error handling</a></h2><p>Unknown options are routed to the installed error handler. The default handler is installed automatically. It writes the offending option and the relevant help text to <tt class="docutils literal"><span class="pre"><span class="Identifier">stderr</span></span></tt>, then exits with code <tt class="docutils literal"><span class="pre"><span class="DecNumber">1</span></span></tt>. You can disable automatic error handling setting <tt class="docutils literal"><span class="pre"><span class="Identifier">helpAuto</span></span></tt> in <a class="reference internal nimdoc" title="object ParserConfig" href="#ParserConfig">ParserConfig</a>.</p>
 <p>Override it with <a class="reference internal nimdoc" title="proc onError(handler: ErrorHandler)" href="#onError,ErrorHandler">onError</a> after the <tt class="docutils literal"><span class="pre"><span class="Identifier">buildParser</span></span></tt> body:</p>
 <pre class="listing"><span class="Identifier">buildParser</span><span class="Punctuation">(</span><span class="StringLit">&quot;myapp&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;Cli&quot;</span><span class="Punctuation">,</span> <span class="Identifier">GnuMode</span><span class="Punctuation">)</span><span class="Punctuation">:</span>
@@ -811,6 +849,17 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
 </div>
 
 </div>
+<div id="command-templates-all">
+  <div id="command.t,string,string,untyped">
+  <dt><pre><span class="Keyword">template</span> <a href="#command.t%2Cstring%2Cstring%2Cuntyped"><span class="Identifier">command</span></a><span class="Other">(</span><span class="Identifier">name</span><span class="Other">,</span> <span class="Identifier">help</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">body</span><span class="Other">:</span> <span class="Identifier">untyped</span><span class="Other">)</span></pre></dt>
+  <dd>
+    
+    
+    
+  </dd>
+</div>
+
+</div>
 <div id="flagreg-templates-all">
   <div id="flagreg.t,char,string,string,string,untyped">
   <dt><pre><span class="Keyword">template</span> <a href="#flagreg.t%2Cchar%2Cstring%2Cstring%2Cstring%2Cuntyped"><span class="Identifier">flagreg</span></a><span class="Other">(</span><span class="Identifier">short</span><span class="Other">:</span> <span class="Identifier">char</span><span class="Other">;</span> <span class="Identifier">name</span><span class="Other">,</span> <span class="Identifier">help</span><span class="Other">,</span> <span class="Identifier">metavar</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">body</span><span class="Other">:</span> <span class="Identifier">untyped</span><span class="Other">)</span></pre></dt>
@@ -854,7 +903,7 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2026-03-10 17:08:44 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2026-03-10 18:51:45 UTC</small>
       </div>
     </div>
   </div>
