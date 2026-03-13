@@ -206,7 +206,7 @@ runnableExamples("-r:off"):
 ## --------------
 ##
 ## No built-in support for default options values is provided.
-## However, Nim's [default values for object fields](https://nim-lang.org/docs/manual.html#types-default-values-for-object-fields) 
+## However, Nim's [default values for object fields](https://nim-lang.org/docs/manual.html#types-default-values-for-object-fields)
 ## enable this convenient pattern:
 runnableExamples("-r:off"):
   from std/strutils import parseInt
@@ -237,8 +237,8 @@ runnableExamples("-r:off"):
       # `h` suppresses the short key for auto-injected help and a hint will be shown
       options.height = validateNum(n)
 
-  echo options.width * options.height  
-## 
+  echo options.width * options.height
+##
 ## Error handling
 ## --------------
 ##
@@ -348,7 +348,7 @@ proc display*(doc: HelpText; palette: HelpPalette; f: File = stdout) =
       else:
         f.styledWrite(style, fg, span.text)
   f.write('\n')
-    
+
 proc display*(doc: HelpText; f: File = stdout) =
   ## `display(HelpText,HelpPalette,File)`_ overload using `DefaultPalette`_.
   display(doc, DefaultPalette, f)
@@ -965,7 +965,7 @@ macro buildParser*(cfg: static ParserConfig;
     errExit = cfg.errorExitCode
     showHelp = cfg.errorShowHelp
     eIdent = ident("e")
-    
+
   let helpPrintCall = helpDisplayCall(quote do: `eIdent`.help,
                         paletteSym, errStream, cfg.useColors)
 

@@ -1,5 +1,5 @@
 # Cozy CLI Parser
-[![License](https://img.shields.io/badge/license-GPLv2%2B-blue.svg)](LICENSE.md)
+[![License](https://img.shields.io/badge/license-GPLv2%2B-blue.svg)](LICENSE)
 
 > Command-Line Parser Builder for Nim.
 
