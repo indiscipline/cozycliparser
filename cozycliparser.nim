@@ -39,7 +39,7 @@ runnableExamples:
     greetName: string = "world"
 
   var options: Options
-  buildParser(parseConfig(helpPrefix = "Greeter v0.1\nThis program greets."),
+  buildParser(parserConfig(helpPrefix = "Greeter v0.1\nThis program greets."),
               "greeter", "Cli", GnuMode):
     opt('\0', "output", "Output file", "FILE") do (val: string):
       options.output = val
@@ -141,7 +141,7 @@ Options:
 runnableExamples:
   import std/strutils
 
-  buildParser(parseConfig(helpPrefix = "MyProg $ver"), "myprog", "Cli", GnuMode):
+  buildParser(parserConfig(helpPrefix = "MyProg $ver"), "myprog", "Cli", GnuMode):
     opt('d', "dir", "Target directory (default: $dir)", "PATH") do (_: string):
       discard
 
@@ -382,7 +382,7 @@ type
 
   ParserConfig* = object
     ## Compile-time configuration for `macro buildParser`_.
-    ## Use `parseConfig`_ proc to selectively override the defaults.
+    ## Use `parserConfig`_ proc to selectively override the defaults.
     helpPrefix*: string = ""   ## A header prepended to all help strings
     helpAuto*: bool = true   ## inject -h/--help at every level unless overridden
     helpFlag*: (char, string) = ('h', "help")
@@ -400,7 +400,7 @@ type
 
 macro emitParserConfigConstructor(): untyped =
   ## Reflects over `ParserConfig` field-by-field and emits:
-  ## `proc parseConfig*(helpAuto = true, ...) : ParserConfig`
+  ## `proc parserConfig*(helpAuto = true, ...) : ParserConfig`
   let
     recList = bindSym("ParserConfig").getImpl[2][2]
     formalParams = nnkFormalParams.newTree(ident("ParserConfig"))
@@ -424,7 +424,7 @@ macro emitParserConfigConstructor(): untyped =
     formalParams.add nnkIdentDefs.newTree(fieldName, newEmptyNode(), fieldDef)
     objConstr.add nnkExprColonExpr.newTree(fieldName, fieldName)
 
-  let procName = ident("parseConfig")
+  let procName = ident("parserConfig")
   result = nnkProcDef.newTree(
      nnkPostfix.newTree(ident("*"), procName),
      newEmptyNode(), newEmptyNode(),
@@ -1081,7 +1081,7 @@ when isMainModule:
 
   var options = Options()
 
-  buildParser(parseConfig(debug = true), "csvtool", "Cli", NimMode):
+  buildParser(parserConfig(debug = true), "csvtool", "Cli", NimMode):
     optreg('s', "separator", "Field separator", "CHAR"):
       options.separator = val
     opt('c', "count", "Number of rows to process", "NUM") do (val: string):

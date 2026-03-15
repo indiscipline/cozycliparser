@@ -54,7 +54,8 @@
   <li><a class="reference" id="cozycliparsercolon-commandminusline-parser-builder_toc" href="#cozycliparsercolon-commandminusline-parser-builder">cozycliparser: Command-Line Parser Builder</a></li>
 <ul class="simple"><li><a class="reference" id="cozycliparsercolon-commandminusline-parser-builder-quick-start_toc" href="#cozycliparsercolon-commandminusline-parser-builder-quick-start">Quick start</a></li>
 <li><a class="reference" id="cozycliparsercolon-commandminusline-parser-builder-accessing-help_toc" href="#cozycliparsercolon-commandminusline-parser-builder-accessing-help">Accessing help</a></li>
-<li><a class="reference" id="cozycliparsercolon-commandminusline-parser-builder-optional-short-slash-long-forms_toc" href="#cozycliparsercolon-commandminusline-parser-builder-optional-short-slash-long-forms">Optional short / long forms</a></li>
+<ul class="simple"><li><a class="reference" id="accessing-help-help-string-interpolation_toc" href="#accessing-help-help-string-interpolation">Help string interpolation</a></li>
+</ul><li><a class="reference" id="cozycliparsercolon-commandminusline-parser-builder-optional-short-slash-long-forms_toc" href="#cozycliparsercolon-commandminusline-parser-builder-optional-short-slash-long-forms">Optional short / long forms</a></li>
 <li><a class="reference" id="cozycliparsercolon-commandminusline-parser-builder-subcommands_toc" href="#cozycliparsercolon-commandminusline-parser-builder-subcommands">Subcommands</a></li>
 <li><a class="reference" id="cozycliparsercolon-commandminusline-parser-builder-default-values_toc" href="#cozycliparsercolon-commandminusline-parser-builder-default-values">Default values</a></li>
 <li><a class="reference" id="cozycliparsercolon-commandminusline-parser-builder-error-handling_toc" href="#cozycliparsercolon-commandminusline-parser-builder-error-handling">Error handling</a></li>
@@ -165,6 +166,10 @@
   <li><a class="reference" href="#flag%2Cchar%2Cstring%2Cstring%2CFlagHandler" title="flag(short: char; name, help: string; handler: FlagHandler)">flag(short: char; name, help: string; handler: FlagHandler)</a></li>
 
 </ul>
+<ul class="simple nested-toc-section">helpInterpolator
+  <li><a class="reference" href="#helpInterpolator%2Cproc%28string%29" title="helpInterpolator(handler: proc (s: string): string)">helpInterpolator(handler: proc (s: string): string)</a></li>
+
+</ul>
 <ul class="simple nested-toc-section">onError
   <li><a class="reference" href="#onError%2CErrorHandler" title="onError(handler: ErrorHandler)">onError(handler: ErrorHandler)</a></li>
 
@@ -173,26 +178,28 @@
   <li><a class="reference" href="#opt%2Cchar%2Cstring%2Cstring%2Cstring%2COptHandler" title="opt(short: char; name, help, metavar: string; handler: OptHandler)">opt(short: char; name, help, metavar: string; handler: OptHandler)</a></li>
 
 </ul>
-<ul class="simple nested-toc-section">parseConfig
-  <li><a class="reference" href="#parseConfig%2Cstring%2C%28char%2C%20string%29%2Cstring%2Cenum%2Cint%2Cint%2Cenum%2Cint%2Cint%2Carray%5BHelpTag%2C%20tuple%5Bfg%3A%20ForegroundColor%2C%20style%3A%20set%5BStyle%5D%5D%5D" title="parseConfig(helpPrefix = &quot;&quot;; helpAuto = true; helpFlag = ('h', &quot;help&quot;);
-            helpText = &quot;Show this help and exit&quot;; helpStream = osStdout;
-            helpExitCode = 0; useColors = true; errorExitCode = 1;
-            errorShowHelp = true; errorStream = osStderr; fmtIndent = 2;
-            fmtColSep = 2; palette = [(fgDefault, {}), (fgDefault, {}),
-                                      (fgYellow, {styleDim}),
-                                      (fgCyan, {styleBright}), (fgCyan, {}),
-                                      (fgGreen, {styleBright}),
-                                      (fgBlue, {styleBright}),
-                                      (fgMagenta, {styleBright})]; debug = false): ParserConfig">parseConfig(helpPrefix = &quot;&quot;; helpAuto = true; helpFlag = ('h', &quot;help&quot;);
-            helpText = &quot;Show this help and exit&quot;; helpStream = osStdout;
-            helpExitCode = 0; useColors = true; errorExitCode = 1;
-            errorShowHelp = true; errorStream = osStderr; fmtIndent = 2;
-            fmtColSep = 2; palette = [(fgDefault, {}), (fgDefault, {}),
-                                      (fgYellow, {styleDim}),
-                                      (fgCyan, {styleBright}), (fgCyan, {}),
-                                      (fgGreen, {styleBright}),
-                                      (fgBlue, {styleBright}),
-                                      (fgMagenta, {styleBright})]; debug = false): ParserConfig</a></li>
+<ul class="simple nested-toc-section">parserConfig
+  <li><a class="reference" href="#parserConfig%2Cstring%2C%28char%2C%20string%29%2Cstring%2Cenum%2Cint%2Cint%2Cenum%2Cint%2Cint%2Carray%5BHelpTag%2C%20tuple%5Bfg%3A%20ForegroundColor%2C%20style%3A%20set%5BStyle%5D%5D%5D" title="parserConfig(helpPrefix = &quot;&quot;; helpAuto = true; helpFlag = ('h', &quot;help&quot;);
+             helpText = &quot;Show this help and exit&quot;; helpStream = osStdout;
+             helpExitCode = 0; useColors = true; errorExitCode = 1;
+             errorShowHelp = true; errorStream = osStderr; fmtIndent = 2;
+             fmtColSep = 2; palette = [(fgDefault, {}), (fgDefault, {}),
+                                       (fgYellow, {styleDim}),
+                                       (fgCyan, {styleBright}), (fgCyan, {}),
+                                       (fgGreen, {styleBright}),
+                                       (fgBlue, {styleBright}),
+                                       (fgMagenta, {styleBright})];
+             debug = false): ParserConfig">parserConfig(helpPrefix = &quot;&quot;; helpAuto = true; helpFlag = ('h', &quot;help&quot;);
+             helpText = &quot;Show this help and exit&quot;; helpStream = osStdout;
+             helpExitCode = 0; useColors = true; errorExitCode = 1;
+             errorShowHelp = true; errorStream = osStderr; fmtIndent = 2;
+             fmtColSep = 2; palette = [(fgDefault, {}), (fgDefault, {}),
+                                       (fgYellow, {styleDim}),
+                                       (fgCyan, {styleBright}), (fgCyan, {}),
+                                       (fgGreen, {styleBright}),
+                                       (fgBlue, {styleBright}),
+                                       (fgMagenta, {styleBright})];
+             debug = false): ParserConfig</a></li>
 
 </ul>
 <ul class="simple nested-toc-section">run
@@ -249,6 +256,10 @@
   <li><a class="reference" href="#runreg.t%2Cuntyped" title="runreg(body: untyped)">runreg(body: untyped)</a></li>
 
 </ul>
+<ul class="simple nested-toc-section">setHelpInterpolator
+  <li><a class="reference" href="#setHelpInterpolator.t%2Cuntyped" title="setHelpInterpolator(body: untyped)">setHelpInterpolator(body: untyped)</a></li>
+
+</ul>
 
     </ul>
   </details>
@@ -286,7 +297,7 @@
   <span class="Identifier">greetName</span><span class="Punctuation">:</span> <span class="Identifier">string</span> <span class="Operator">=</span> <span class="StringLit">&quot;world&quot;</span>
 
 <span class="Keyword">var</span> <span class="Identifier">options</span><span class="Punctuation">:</span> <span class="Identifier">Options</span>
-<span class="Identifier">buildParser</span><span class="Punctuation">(</span><span class="Identifier">parseConfig</span><span class="Punctuation">(</span><span class="Identifier">helpPrefix</span> <span class="Operator">=</span> <span class="StringLit">&quot;Greeter v0.1</span><span class="EscapeSequence">\n</span><span class="StringLit">This program greets.&quot;</span><span class="Punctuation">)</span><span class="Punctuation">,</span>
+<span class="Identifier">buildParser</span><span class="Punctuation">(</span><span class="Identifier">parserConfig</span><span class="Punctuation">(</span><span class="Identifier">helpPrefix</span> <span class="Operator">=</span> <span class="StringLit">&quot;Greeter v0.1</span><span class="EscapeSequence">\n</span><span class="StringLit">This program greets.&quot;</span><span class="Punctuation">)</span><span class="Punctuation">,</span>
             <span class="StringLit">&quot;greeter&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;Cli&quot;</span><span class="Punctuation">,</span> <span class="Identifier">GnuMode</span><span class="Punctuation">)</span><span class="Punctuation">:</span>
   <span class="Identifier">opt</span><span class="Punctuation">(</span><span class="CharLit">'\0'</span><span class="Punctuation">,</span> <span class="StringLit">&quot;output&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;Output file&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;FILE&quot;</span><span class="Punctuation">)</span> <span class="Keyword">do</span> <span class="Punctuation">(</span><span class="Identifier">val</span><span class="Punctuation">:</span> <span class="Identifier">string</span><span class="Punctuation">)</span><span class="Punctuation">:</span>
     <span class="Identifier">options</span><span class="Operator">.</span><span class="Identifier">output</span> <span class="Operator">=</span> <span class="Identifier">val</span>
@@ -339,6 +350,38 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
 <span class="Identifier">quit</span><span class="Punctuation">(</span><span class="Operator">$</span><span class="Identifier">Cli</span><span class="Operator">.</span><span class="Identifier">foo</span><span class="Operator">.</span><span class="Identifier">bar</span><span class="Operator">.</span><span class="Identifier">help</span><span class="Punctuation">,</span> <span class="DecNumber">0</span><span class="Punctuation">)</span>  <span class="Comment"># pass plain string if required</span></pre><div class="admonition admonition-info"><span class="admonition-info-text"><b>Note:</b></span>
 &quot;bare&quot; subcommands with only a <tt class="docutils literal"><span class="pre"><span class="Identifier">run</span></span></tt> handler and no <tt class="docutils literal"><span class="pre"><span class="Identifier">arg</span></span></tt>, <tt class="docutils literal"><span class="pre"><span class="Identifier">opt</span></span></tt>, or <tt class="docutils literal"><span class="pre"><span class="Identifier">flag</span></span></tt> registrations do not receive a namespace entry. Accessing <tt class="docutils literal"><span class="pre"><span class="Operator">&lt;</span><span class="Identifier">helpName</span><span class="Operator">&gt;.&lt;</span><span class="Identifier">subcmd</span><span class="Operator">&gt;.</span><span class="Identifier">help</span></span></tt> for such a subcommand will not compile. The default auto-generated help shows the help text of such command's parent level.</div>
 <p>The namespace is available inside handler closures too, since it is injected before their declarations are emitted.</p>
+
+<h3><a class="toc-backref" id="accessing-help-help-string-interpolation" href="#accessing-help-help-string-interpolation">Help string interpolation</a></h3><p>Because <tt class="docutils literal"><span class="pre"><span class="Identifier">HelpText</span></span></tt> is built at compile time, injecting dynamic runtime values (like the current directory or an environmantal variable) into help descriptions is done via a lazy interpolation (string replacement) hook.</p>
+<p>Register a global interpolator using <a class="reference internal nimdoc" title="proc helpInterpolator(handler: proc (s: string): string)" href="#helpInterpolator,proc(string)">helpInterpolator</a> or the <a class="reference internal nimdoc" title="template setHelpInterpolator(body: untyped)" href="#setHelpInterpolator.t,untyped">setHelpInterpolator</a> template. The registered closure is invoked exactly when the help text is converted to a string (<tt class="docutils literal"><span class="pre"><span class="Operator">$</span></span></tt>) or displayed.</p>
+<p>Only plain-text help spans (the optional <tt class="docutils literal"><span class="pre"><span class="Identifier">helpPrefix</span></span></tt> and description paragraphs) are passed through the interpolator. Left-column syntax (keys, arg names, metavars, section names) is not interpolated.</p>
+<div class="admonition admonition-warning"><span class="admonition-warning-text"><b>Warning:</b></span>
+Adding new lines to the interpolated strings will break formatting!</div>
+
+<p><strong class="examples_text">Example:</strong></p>
+<pre class="listing"><span class="Keyword">import</span> <span class="Identifier">cozycliparser</span>
+<span class="Keyword">import</span> <span class="Identifier">std</span><span class="Operator">/</span><span class="Identifier">strutils</span>
+
+<span class="Identifier">buildParser</span><span class="Punctuation">(</span><span class="Identifier">parserConfig</span><span class="Punctuation">(</span><span class="Identifier">helpPrefix</span> <span class="Operator">=</span> <span class="StringLit">&quot;MyProg $ver&quot;</span><span class="Punctuation">)</span><span class="Punctuation">,</span> <span class="StringLit">&quot;myprog&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;Cli&quot;</span><span class="Punctuation">,</span> <span class="Identifier">GnuMode</span><span class="Punctuation">)</span><span class="Punctuation">:</span>
+  <span class="Identifier">opt</span><span class="Punctuation">(</span><span class="CharLit">'d'</span><span class="Punctuation">,</span> <span class="StringLit">&quot;dir&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;Target directory (default: $dir)&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;PATH&quot;</span><span class="Punctuation">)</span> <span class="Keyword">do</span> <span class="Punctuation">(</span><span class="Identifier">_</span><span class="Punctuation">:</span> <span class="Identifier">string</span><span class="Punctuation">)</span><span class="Punctuation">:</span>
+    <span class="Keyword">discard</span>
+
+<span class="Keyword">let</span> <span class="Identifier">currentDir</span> <span class="Operator">=</span> <span class="StringLit">&quot;/tmp&quot;</span> <span class="Comment"># simulates the 'os.getCurrentDir' call</span>
+
+<span class="Identifier">setHelpInterpolator</span><span class="Punctuation">(</span><span class="Punctuation">)</span><span class="Punctuation">:</span>
+  <span class="Identifier">s</span><span class="Operator">.</span><span class="Identifier">multiReplace</span><span class="Punctuation">(</span>
+    <span class="Punctuation">(</span><span class="StringLit">&quot;$ver&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;v1.2.3&quot;</span><span class="Punctuation">)</span><span class="Punctuation">,</span>  <span class="Comment"># literal value</span>
+    <span class="Punctuation">(</span><span class="StringLit">&quot;$dir&quot;</span><span class="Punctuation">,</span> <span class="Identifier">currentDir</span><span class="Punctuation">)</span> <span class="Comment"># captured variable avoids repeated lazy evaluation</span>
+  <span class="Punctuation">)</span>
+
+<span class="Identifier">doAssert</span> <span class="Operator">$</span><span class="Identifier">Cli</span><span class="Operator">.</span><span class="Identifier">help</span> <span class="Operator">==</span> <span class="LongStringLit">&quot;&quot;&quot;
+MyProg v1.2.3
+
+Usage: myprog [options]
+
+Options:
+  -d, --dir=PATH  Target directory (default: /tmp)
+  -h, --help      Show this help and exit&quot;&quot;&quot;</span></pre>Now, whenever <tt class="docutils literal"><span class="pre"><span class="Identifier">Cli</span><span class="Operator">.</span><span class="Identifier">help</span><span class="Operator">.</span><span class="Identifier">display</span><span class="Punctuation">(</span><span class="Punctuation">)</span></span></tt> is called - whether manually, via the auto-injected <tt class="docutils literal"><span class="pre"><span class="Operator">-</span><span class="Identifier">h</span></span></tt> flag, or within the autogenerated <tt class="docutils literal"><span class="pre"><span class="Identifier">onError</span></span></tt> handler - the placeholders are cleanly replaced.<div class="admonition admonition-warning"><span class="admonition-warning-text"><b>Important:</b></span>
+Registered interpolator fires multiple times, for each plain span of the help text, so calls used inside will be repeatedly evaluated. Evaluate them preemptively and access or cache via captured variables to eschew the computational cost. In the example above, the whole replacement array passed to <tt class="docutils literal"><span class="pre"><span class="Identifier">multiReplace</span></span></tt> could have been neatly stored outside of the closure.</div>
 
 <h2><a class="toc-backref" id="cozycliparsercolon-commandminusline-parser-builder-optional-short-slash-long-forms" href="#cozycliparsercolon-commandminusline-parser-builder-optional-short-slash-long-forms">Optional short / long forms</a></h2><ul class="simple"><li>Pass <tt class="docutils literal"><span class="pre"><span class="CharLit">'\0'</span></span></tt> (or any char with <tt class="docutils literal"><span class="pre"><span class="Identifier">ord</span> <span class="Operator">&lt;</span> <span class="DecNumber">32</span></span></tt>) as <tt class="docutils literal"><span class="pre"><span class="Identifier">short</span></span></tt> to suppress the short form of an option or flag.</li>
 <li>Pass <tt class="docutils literal"><span class="pre"><span class="StringLit">&quot;&quot;</span></span></tt> as <tt class="docutils literal"><span class="pre"><span class="Identifier">name</span></span></tt> to suppress the long form.</li>
@@ -433,7 +476,7 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
 <span class="Identifier">echo</span> <span class="Identifier">options</span><span class="Operator">.</span><span class="Identifier">width</span> <span class="Operator">*</span> <span class="Identifier">options</span><span class="Operator">.</span><span class="Identifier">height</span></pre>
 <h2><a class="toc-backref" id="cozycliparsercolon-commandminusline-parser-builder-error-handling" href="#cozycliparsercolon-commandminusline-parser-builder-error-handling">Error handling</a></h2><p>Unknown options are routed to the installed error handler. The default handler is installed automatically. It writes the offending option and the relevant help text to <tt class="docutils literal"><span class="pre"><span class="Identifier">stderr</span></span></tt>, then exits with code <tt class="docutils literal"><span class="pre"><span class="DecNumber">1</span></span></tt>. You can disable automatic error handling setting <tt class="docutils literal"><span class="pre"><span class="Identifier">helpAuto</span></span></tt> in <a class="reference internal nimdoc" title="object ParserConfig" href="#ParserConfig">ParserConfig</a>.</p>
 <p>Override it with <a class="reference internal nimdoc" title="proc onError(handler: ErrorHandler)" href="#onError,ErrorHandler">onError</a> after the <tt class="docutils literal"><span class="pre"><span class="Identifier">buildParser</span></span></tt> body:</p>
-<pre class="listing"><span class="Identifier">buildParser</span><span class="Punctuation">(</span><span class="StringLit">&quot;myapp&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;Cli&quot;</span><span class="Punctuation">,</span> <span class="Identifier">GnuMode</span><span class="Punctuation">)</span><span class="Punctuation">:</span>
+<pre class="listing"><span class="Identifier">buildParser</span><span class="Punctuation">(</span><span class="StringLit">&quot;myprog&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;Cli&quot;</span><span class="Punctuation">,</span> <span class="Identifier">GnuMode</span><span class="Punctuation">)</span><span class="Punctuation">:</span>
   <span class="Operator">...</span>
 
 <span class="Identifier">onError</span> <span class="Keyword">do</span> <span class="Punctuation">(</span><span class="Identifier">e</span><span class="Punctuation">:</span> <span class="Identifier">ParseError</span><span class="Punctuation">)</span><span class="Punctuation">:</span>
@@ -597,16 +640,17 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
   <dd>
     
     Compile-time configuration for <a class="reference internal nimdoc" title="macro buildParser(cfg: static ParserConfig; progName, helpName: static string;
-            mode: static CliMode; body: typed): untyped" href="#buildParser.m,staticParserConfig,staticstring,staticstring,staticCliMode,typed">macro buildParser</a>. Use <a class="reference internal nimdoc" title="proc parseConfig(helpPrefix = &quot;&quot;; helpAuto = true; helpFlag = ('h', &quot;help&quot;);
-            helpText = &quot;Show this help and exit&quot;; helpStream = osStdout;
-            helpExitCode = 0; useColors = true; errorExitCode = 1;
-            errorShowHelp = true; errorStream = osStderr; fmtIndent = 2;
-            fmtColSep = 2; palette = [(fgDefault, {}), (fgDefault, {}),
-                                      (fgYellow, {styleDim}),
-                                      (fgCyan, {styleBright}), (fgCyan, {}),
-                                      (fgGreen, {styleBright}),
-                                      (fgBlue, {styleBright}),
-                                      (fgMagenta, {styleBright})]; debug = false): ParserConfig" href="#parseConfig,string,(char, string),string,enum,int,int,enum,int,int,array[HelpTag, tuple[fg: ForegroundColor, style: set[Style]]]">parseConfig</a> proc to selectively override the defaults.
+            mode: static CliMode; body: typed): untyped" href="#buildParser.m,staticParserConfig,staticstring,staticstring,staticCliMode,typed">macro buildParser</a>. Use <a class="reference internal nimdoc" title="proc parserConfig(helpPrefix = &quot;&quot;; helpAuto = true; helpFlag = ('h', &quot;help&quot;);
+             helpText = &quot;Show this help and exit&quot;; helpStream = osStdout;
+             helpExitCode = 0; useColors = true; errorExitCode = 1;
+             errorShowHelp = true; errorStream = osStderr; fmtIndent = 2;
+             fmtColSep = 2; palette = [(fgDefault, {}), (fgDefault, {}),
+                                       (fgYellow, {styleDim}),
+                                       (fgCyan, {styleBright}), (fgCyan, {}),
+                                       (fgGreen, {styleBright}),
+                                       (fgBlue, {styleBright}),
+                                       (fgMagenta, {styleBright})];
+             debug = false): ParserConfig" href="#parserConfig,string,(char, string),string,enum,int,int,enum,int,int,array[HelpTag, tuple[fg: ForegroundColor, style: set[Style]]]">parserConfig</a> proc to selectively override the defaults.
     
   </dd>
 </div>
@@ -650,7 +694,8 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
   <dl class="item">
     <div id="$-procs-all">
   <div id="$,HelpText">
-  <dt><pre><span class="Keyword">proc</span> <a href="#%24%2CHelpText"><span class="Identifier">`$`</span></a><span class="Other">(</span><span class="Identifier">doc</span><span class="Other">:</span> <a href="#HelpText"><span class="Identifier">HelpText</span></a><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">string</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dt><pre><span class="Keyword">proc</span> <a href="#%24%2CHelpText"><span class="Identifier">`$`</span></a><span class="Other">(</span><span class="Identifier">doc</span><span class="Other">:</span> <a href="#HelpText"><span class="Identifier">HelpText</span></a><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">string</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">RootEffect</span><span class="Other">]</span><span class="Other">,</span>
+                                  <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
     
@@ -690,8 +735,8 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
 </div>
 <div id="display-procs-all">
   <div id="display,HelpText,File">
-  <dt><pre><span class="Keyword">proc</span> <a href="#display%2CHelpText%2CFile"><span class="Identifier">display</span></a><span class="Other">(</span><span class="Identifier">doc</span><span class="Other">:</span> <a href="#HelpText"><span class="Identifier">HelpText</span></a><span class="Other">;</span> <span class="Identifier">f</span><span class="Other">:</span> <span class="Identifier">File</span> <span class="Other">=</span> <span class="Identifier">stdout</span><span class="Other">)</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">IOError</span><span class="Other">]</span><span class="Other">,</span>
-    <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">ReadEnvEffect</span><span class="Other">,</span> <span class="Identifier">WriteIOEffect</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dt><pre><span class="Keyword">proc</span> <a href="#display%2CHelpText%2CFile"><span class="Identifier">display</span></a><span class="Other">(</span><span class="Identifier">doc</span><span class="Other">:</span> <a href="#HelpText"><span class="Identifier">HelpText</span></a><span class="Other">;</span> <span class="Identifier">f</span><span class="Other">:</span> <span class="Identifier">File</span> <span class="Other">=</span> <span class="Identifier">stdout</span><span class="Other">)</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">IOError</span><span class="Other">,</span> <span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span>
+    <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">ReadEnvEffect</span><span class="Other">,</span> <span class="Identifier">WriteIOEffect</span><span class="Other">,</span> <span class="Identifier">RootEffect</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
     <a class="reference internal nimdoc" title="proc display(doc: HelpText; palette: HelpPalette; f: File = stdout)" href="#display,HelpText,HelpPalette,File">display(HelpText,HelpPalette,File)</a> overload using <a class="reference internal nimdoc" title="const DefaultPalette" href="#DefaultPalette">DefaultPalette</a>.
@@ -700,7 +745,8 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
 </div>
 <div id="display,HelpText,HelpPalette,File">
   <dt><pre><span class="Keyword">proc</span> <a href="#display%2CHelpText%2CHelpPalette%2CFile"><span class="Identifier">display</span></a><span class="Other">(</span><span class="Identifier">doc</span><span class="Other">:</span> <a href="#HelpText"><span class="Identifier">HelpText</span></a><span class="Other">;</span> <span class="Identifier">palette</span><span class="Other">:</span> <a href="#HelpPalette"><span class="Identifier">HelpPalette</span></a><span class="Other">;</span> <span class="Identifier">f</span><span class="Other">:</span> <span class="Identifier">File</span> <span class="Other">=</span> <span class="Identifier">stdout</span><span class="Other">)</span> {.
-    <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">IOError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">ReadEnvEffect</span><span class="Other">,</span> <span class="Identifier">WriteIOEffect</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+    <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">IOError</span><span class="Other">,</span> <span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span>
+    <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">ReadEnvEffect</span><span class="Other">,</span> <span class="Identifier">WriteIOEffect</span><span class="Other">,</span> <span class="Identifier">RootEffect</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
     <p>Checks if <tt class="docutils literal"><span class="pre"><span class="Identifier">f</span></span></tt> can and is allowed to emit colored output and, correspondingly, displays <tt class="docutils literal"><span class="pre"><span class="Identifier">doc</span></span></tt> styled with <tt class="docutils literal"><span class="pre"><span class="Identifier">palette</span></span></tt> or as a plain text.</p>
@@ -720,6 +766,18 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
     <p>Registers a boolean flag (<tt class="docutils literal"><span class="pre"><span class="Operator">--</span><span class="Identifier">name</span></span></tt> / <tt class="docutils literal"><span class="pre"><span class="Operator">-</span><span class="Identifier">s</span></span></tt>), fired with no value.</p>
 <p>Pass <tt class="docutils literal"><span class="pre"><span class="CharLit">'\0'</span></span></tt> for <tt class="docutils literal"><span class="pre"><span class="Identifier">short</span></span></tt> to omit the short form; <tt class="docutils literal"><span class="pre"><span class="StringLit">&quot;&quot;</span></span></tt> for <tt class="docutils literal"><span class="pre"><span class="Identifier">name</span></span></tt> to omit the long form.</p>
 
+    
+  </dd>
+</div>
+
+</div>
+<div id="helpInterpolator-procs-all">
+  <div id="helpInterpolator,proc(string)">
+  <dt><pre><span class="Keyword">proc</span> <a href="#helpInterpolator%2Cproc%28string%29"><span class="Identifier">helpInterpolator</span></a><span class="Other">(</span><span class="Identifier">handler</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span>
+    <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    Installs a custom interpolator for help text descriptions and prefixes. Evaluated lazily when help text is converted to string or displayed.
     
   </dd>
 </div>
@@ -754,13 +812,13 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
 </div>
 
 </div>
-<div id="parseConfig-procs-all">
-  <div id="parseConfig,string,(char, string),string,enum,int,int,enum,int,int,array[HelpTag, tuple[fg: ForegroundColor, style: set[Style]]]">
-  <dt><pre><span class="Keyword">proc</span> <a href="#parseConfig%2Cstring%2C%28char%2C%20string%29%2Cstring%2Cenum%2Cint%2Cint%2Cenum%2Cint%2Cint%2Carray%5BHelpTag%2C%20tuple%5Bfg%3A%20ForegroundColor%2C%20style%3A%20set%5BStyle%5D%5D%5D"><span class="Identifier">parseConfig</span></a><span class="Other">(</span><span class="Identifier">helpPrefix</span> <span class="Other">=</span> <span class="StringLit">&quot;&quot;</span><span class="Other">;</span> <span class="Identifier">helpAuto</span> <span class="Other">=</span> <span class="Identifier">true</span><span class="Other">;</span> <span class="Identifier">helpFlag</span> <span class="Other">=</span> <span class="Other">(</span><span class="CharLit">'h'</span><span class="Other">,</span> <span class="StringLit">&quot;help&quot;</span><span class="Other">)</span><span class="Other">;</span>
-                 <span class="Identifier">helpText</span> <span class="Other">=</span> <span class="StringLit">&quot;Show this help and exit&quot;</span><span class="Other">;</span> <span class="Identifier">helpStream</span> <span class="Other">=</span> <span class="DecNumber">osStdout</span><span class="Other">;</span>
-                 <span class="Identifier">helpExitCode</span> <span class="Other">=</span> <span class="DecNumber">0</span><span class="Other">;</span> <span class="Identifier">useColors</span> <span class="Other">=</span> <span class="Identifier">true</span><span class="Other">;</span> <span class="Identifier">errorExitCode</span> <span class="Other">=</span> <span class="DecNumber">1</span><span class="Other">;</span>
-                 <span class="Identifier">errorShowHelp</span> <span class="Other">=</span> <span class="Identifier">true</span><span class="Other">;</span> <span class="Identifier">errorStream</span> <span class="Other">=</span> <span class="DecNumber">osStderr</span><span class="Other">;</span> <span class="Identifier">fmtIndent</span> <span class="Other">=</span> <span class="DecNumber">2</span><span class="Other">;</span>
-                 <span class="Identifier">fmtColSep</span> <span class="Other">=</span> <span class="DecNumber">2</span><span class="Other">;</span> <span class="Identifier">palette</span> <span class="Other">=</span> <span class="Other">[</span><span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
+<div id="parserConfig-procs-all">
+  <div id="parserConfig,string,(char, string),string,enum,int,int,enum,int,int,array[HelpTag, tuple[fg: ForegroundColor, style: set[Style]]]">
+  <dt><pre><span class="Keyword">proc</span> <a href="#parserConfig%2Cstring%2C%28char%2C%20string%29%2Cstring%2Cenum%2Cint%2Cint%2Cenum%2Cint%2Cint%2Carray%5BHelpTag%2C%20tuple%5Bfg%3A%20ForegroundColor%2C%20style%3A%20set%5BStyle%5D%5D%5D"><span class="Identifier">parserConfig</span></a><span class="Other">(</span><span class="Identifier">helpPrefix</span> <span class="Other">=</span> <span class="StringLit">&quot;&quot;</span><span class="Other">;</span> <span class="Identifier">helpAuto</span> <span class="Other">=</span> <span class="Identifier">true</span><span class="Other">;</span> <span class="Identifier">helpFlag</span> <span class="Other">=</span> <span class="Other">(</span><span class="CharLit">'h'</span><span class="Other">,</span> <span class="StringLit">&quot;help&quot;</span><span class="Other">)</span><span class="Other">;</span>
+                  <span class="Identifier">helpText</span> <span class="Other">=</span> <span class="StringLit">&quot;Show this help and exit&quot;</span><span class="Other">;</span> <span class="Identifier">helpStream</span> <span class="Other">=</span> <span class="DecNumber">osStdout</span><span class="Other">;</span>
+                  <span class="Identifier">helpExitCode</span> <span class="Other">=</span> <span class="DecNumber">0</span><span class="Other">;</span> <span class="Identifier">useColors</span> <span class="Other">=</span> <span class="Identifier">true</span><span class="Other">;</span> <span class="Identifier">errorExitCode</span> <span class="Other">=</span> <span class="DecNumber">1</span><span class="Other">;</span>
+                  <span class="Identifier">errorShowHelp</span> <span class="Other">=</span> <span class="Identifier">true</span><span class="Other">;</span> <span class="Identifier">errorStream</span> <span class="Other">=</span> <span class="DecNumber">osStderr</span><span class="Other">;</span> <span class="Identifier">fmtIndent</span> <span class="Other">=</span> <span class="DecNumber">2</span><span class="Other">;</span>
+                  <span class="Identifier">fmtColSep</span> <span class="Other">=</span> <span class="DecNumber">2</span><span class="Other">;</span> <span class="Identifier">palette</span> <span class="Other">=</span> <span class="Other">[</span><span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
     <span class="Other">(</span><span class="DecNumber">fgYellow</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleDim</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
     <span class="Other">(</span><span class="DecNumber">fgGreen</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgBlue</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
     <span class="Other">(</span><span class="DecNumber">fgMagenta</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">debug</span> <span class="Other">=</span> <span class="Identifier">false</span><span class="Other">)</span><span class="Other">:</span> <a href="#ParserConfig"><span class="Identifier">ParserConfig</span></a> {.<span class="Identifier">compiletime</span><span class="Other">,</span>
@@ -788,7 +846,8 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
 </div>
 <div id="write-procs-all">
   <div id="write,File,HelpText">
-  <dt><pre><span class="Keyword">proc</span> <a href="#write%2CFile%2CHelpText"><span class="Identifier">write</span></a><span class="Other">(</span><span class="Identifier">f</span><span class="Other">:</span> <span class="Identifier">File</span><span class="Other">;</span> <span class="Identifier">doc</span><span class="Other">:</span> <a href="#HelpText"><span class="Identifier">HelpText</span></a><span class="Other">)</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">IOError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">WriteIOEffect</span><span class="Other">]</span><span class="Other">,</span>
+  <dt><pre><span class="Keyword">proc</span> <a href="#write%2CFile%2CHelpText"><span class="Identifier">write</span></a><span class="Other">(</span><span class="Identifier">f</span><span class="Other">:</span> <span class="Identifier">File</span><span class="Other">;</span> <span class="Identifier">doc</span><span class="Other">:</span> <a href="#HelpText"><span class="Identifier">HelpText</span></a><span class="Other">)</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">IOError</span><span class="Other">,</span> <span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span>
+                                     <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">WriteIOEffect</span><span class="Other">,</span> <span class="Identifier">RootEffect</span><span class="Other">]</span><span class="Other">,</span>
                                      <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
@@ -893,6 +952,17 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
 </div>
 
 </div>
+<div id="setHelpInterpolator-templates-all">
+  <div id="setHelpInterpolator.t,untyped">
+  <dt><pre><span class="Keyword">template</span> <a href="#setHelpInterpolator.t%2Cuntyped"><span class="Identifier">setHelpInterpolator</span></a><span class="Other">(</span><span class="Identifier">body</span><span class="Other">:</span> <span class="Identifier">untyped</span><span class="Other">)</span></pre></dt>
+  <dd>
+    
+    Convenience wrapper for <a class="reference internal nimdoc" title="proc helpInterpolator(handler: proc (s: string): string)" href="#helpInterpolator,proc(string)">helpInterpolator</a>. Injects <tt class="docutils literal"><span class="pre"><span class="Identifier">s</span></span></tt> for the closure's string parameter.
+    
+  </dd>
+</div>
+
+</div>
 
   </dl>
 </div>
@@ -903,7 +973,7 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2026-03-13 01:23:20 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2026-03-15 19:52:34 UTC</small>
       </div>
     </div>
   </div>
