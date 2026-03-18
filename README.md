@@ -51,7 +51,7 @@ type Options = object
   greetName: string = "world"
 
 var options: Options
-buildParser(parseConfig(helpPrefix = "Greeter v0.1\nThis program greets."),
+buildParser(parserConfig(helpPrefix = "Greeter v0.1\nThis program greets."),
             "greeter", "Cli", GnuMode):
   opt('\0', "output", "Output file", "FILE") do (val: string):
     options.output = val
