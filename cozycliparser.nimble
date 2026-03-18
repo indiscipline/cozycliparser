@@ -1,5 +1,5 @@
 # Package
-version       = "0.2.0"
+version       = "0.3.0"
 author        = "Kirill I."
 description   = "CLI parser builder, a convenience wrapper over `std/parseopt`"
 license       = "GPL-2.0-or-later"
