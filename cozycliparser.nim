@@ -145,9 +145,13 @@ runnableExamples("-r:off"):
 ## values (like the current directory or an environment variable) into help
 ## descriptions is done via a lazy interpolation (string replacement) hook.
 ##
-## Register an interpolator on the token using `setHelpInterpolator`_.
-## The closure is invoked exactly when the help text is converted to a
-## string (`$`) or displayed.
+## Register an interpolator inside the `buildParser`_ body using
+## `setHelpInterpolator`_. The closure is invoked exactly when the help
+## text is converted to a string (`$`) or displayed.
+##
+## The interpolator must be registered inside the body (not after
+## `buildParser` returns) so that it is in place before the parser loop
+## runs and can fire if `-h` is passed.
 ##
 ## Only plain-text help spans (the optional `helpPrefix` and description
 ## paragraphs) are passed through the interpolator. Left-column syntax
@@ -159,17 +163,16 @@ runnableExamples("-r:off"):
 runnableExamples:
   import std/strutils
 
+  let currentDir = "/tmp" # simulates os.getCurrentDir(); captured by closure below
+
   buildParser(parserConfig(helpPrefix = "MyProg $ver"), "myprog", "Cli", GnuMode):
     opt('d', "dir", "Target directory (default: $dir)", "PATH") do (_: string):
       discard
-
-  let currentDir = "/tmp" # simulates os.getCurrentDir()
-
-  Cli.setHelpInterpolator:
-    s.multiReplace(
-      ("$ver", "v1.2.3"),
-      ("$dir", currentDir)
-    )
+    Cli.setHelpInterpolator:
+      s.multiReplace(
+        ("$ver", "v1.2.3"),
+        ("$dir", currentDir)
+      )
 
   doAssert $Cli.help == """
 MyProg v1.2.3
@@ -182,7 +185,7 @@ Options:
 ##
 ## The registered interpolator fires once per plain-text span, so calls
 ## inside it are evaluated repeatedly. Precompute and cache any expensive
-## values in variables before the closure captures them.
+## values in variables before the closure captures them, as shown above.
 ##
 ## Optional short / long forms
 ## ---------------------------
@@ -800,6 +803,11 @@ proc injectAutoHelp(scope: Scope; cfg: ParserConfig;
                            name: if longOverridden: ""   else: hLong,
                            help: cfg.helpText)
 
+proc strArgVal(n: NimNode): string =
+  if n.kind notin {nnkStrLit, nnkRStrLit, nnkTripleStrLit}:
+    error("buildParser: metadata argument must be a compile-time constant string", n)
+  n.strVal
+
 proc extractScope(progName: string; body: NimNode; cfg: ParserConfig;
                   path: string; baseIdx: int): tuple[s: Scope, next: int] =
   var scope = Scope(progName: progName, path: path)
@@ -817,19 +825,21 @@ proc extractScope(progName: string; body: NimNode; cfg: ParserConfig;
 
   for stmt in stmts:
     if stmt.kind in {nnkCommentStmt, nnkEmpty, nnkMixinStmt}: continue
+    if stmt.kind == nnkBlockStmt: continue  ## explicit escape hatch
     if stmt.kind notin {nnkCall, nnkCommand}:
       error("buildParser: only opt, flag, arg, run, cmd calls are allowed " &
-            "in the parser body", stmt)
+            "in the parser body; use a bare `block:` for other statements", stmt)
     let callee = $stmt[0]
     case callee
+    of "helpInterpolator": continue
     of "opt", "flag":
       let isOpt = callee == "opt"
       let spec = OptSpec(
         kind: if isOpt: okOpt else: okFlag,
         short: chr(stmt[1].intVal.uint8),
-        name: stmt[2].strVal,
-        help: stmt[3].strVal,
-        metavar: if isOpt: stmt[4].strVal else: "",
+        name: stmt[2].strArgVal(),
+        help: stmt[3].strArgVal(),
+        metavar: if isOpt: stmt[4].strArgVal() else: "",
         absIdx: baseIdx + next)
       if not spec.hasShort and not spec.hasLong:
         error(callee & ": must have at least one of short or long form", stmt)
@@ -845,8 +855,8 @@ proc extractScope(progName: string; body: NimNode; cfg: ParserConfig;
     of "arg":
       let absIdx = baseIdx + next
       scope.argIdxs.add absIdx
-      scope.specs.add OptSpec(kind: okArg, name: stmt[1].strVal,
-                              help: stmt[2].strVal, absIdx: absIdx)
+      scope.specs.add OptSpec(kind: okArg, name: stmt[1].strArgVal(),
+                              help: stmt[2].strArgVal(), absIdx: absIdx)
       inc next
     of "run":
       if scope.runIdx >= 0:
@@ -856,22 +866,27 @@ proc extractScope(progName: string; body: NimNode; cfg: ParserConfig;
       inc next
     of "cmd":
       let
-        name = stmt[1].strVal
-        cmdHelp = stmt[2].strVal
+        name = stmt[1].strArgVal()
+        cmdHelp = stmt[2].strArgVal()
         rawClosure = stmt[^1]
         lambdaNode =
           case rawClosure.kind
           of nnkHiddenStdConv: rawClosure[^1]
           of nnkLambda, nnkProcDef: rawClosure
           else: rawClosure
+      let cmdBody = block:
+        let raw = lambdaNode[^1]
+        if raw.kind == nnkStmtList: raw
+        else: newTree(nnkStmtList, raw)
       let (childScope, childSize) =
-        extractScope(progName, lambdaNode[^1], cfg,
+        extractScope(progName, cmdBody, cfg,
                      (if path.len > 0: path & " " & name else: name), baseIdx + next)
       next.inc childSize
       scope.cmds.add CmdSpec(name: name, help: cmdHelp, scope: childScope)
     else:
       error("buildParser: unexpected call '" & callee & "' - only opt, " &
-            "flag, arg, run and cmd are allowed in the parser body", stmt)
+            "flag, arg, run, cmd and helpInterpolator are allowed " &
+            "directly in the parser body. Use `block:` for other calls", stmt)
 
   scope.bareRun = scope.cmds.len == 0 and scope.argIdxs.len == 0 and
     scope.specs.len == (if scope.runIdx >= 0: 1 else: 0)
@@ -1077,8 +1092,9 @@ macro setParser*(helpName: static string): untyped =
   ## explicitly only when you need to reference the token *before* `buildParser`
   ## runs - for example, to use inside functions that require help display
   ## and are called from inside the handler closures.
-  ## After `setParser`, `helpName` is a valid symbol, but its help storage is
-  ## empty until `buildParser` # populates it.
+  ##
+  ## After `setParser`, `helpName` becomes a valid symbol, but its help storage
+  ## is empty until `buildParser`_ populates it.
   ##
   ## Pass the `helpName` symbol directly to the token-taking `buildParser`
   ## overload, don't pass the string name again, as that would redeclare the symbol.
@@ -1144,7 +1160,7 @@ macro buildParser*(cfg: static ParserConfig;
     block:
       bpActive = BpContext()
       `body`
-      bpStorage(`token`) = bpActive
+      bpStorage(`token`).handlers = bpActive.handlers
       `helpLookupInit`
     `defaultOnError`
     `dispatchers`
@@ -1163,7 +1179,7 @@ template buildParser*(progName: static string;
 template buildParser*(cfg: static ParserConfig;
                       progName, helpName: static string;
                       mode: static CliMode;
-                      body: typed): untyped =
+                      body: untyped): untyped =
   ## Unified single-call overload. Equivalent to `setParser(helpName)` +
   ## `buildParser(cfg, progName, <token>, mode, body)`.
   ## Injects `const <helpName>` into the outer scope.
