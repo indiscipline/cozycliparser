@@ -5,6 +5,8 @@
 ## cozycliparser: Command-Line Parser Builder
 ## ==========================================
 ##
+## :Version: |nimbleversion|
+##
 ## A thin but useful wrapper over `std/parseopt`.
 ##
 ## Features:
@@ -145,7 +147,7 @@ runnableExamples("-r:off"):
 ## values (like the current directory or an environment variable) into help
 ## descriptions is done via a lazy interpolation (string replacement) hook.
 ##
-## Register an interpolator inside the `buildParser`_ body using
+## Register an interpolator inside the `macro buildParser`_ body using
 ## `setHelpInterpolator`_. The closure is invoked exactly when the help
 ## text is converted to a string (`$`) or displayed.
 ##
@@ -814,7 +816,10 @@ proc extractScope(progName: string; body: NimNode; cfg: ParserConfig;
   var next = 0
 
   var stmts: seq[NimNode]
-  for s in body:
+  let bodyStmts = # wrapping a single-call body for uniformity
+    if body.kind == nnkStmtList: body
+    else: newTree(nnkStmtList, body)
+  for s in bodyStmts:
     if s.kind == nnkStmtList:
       for inner in s: stmts.add inner
     else: stmts.add s
@@ -1094,7 +1099,7 @@ macro setParser*(helpName: static string): untyped =
   ## and are called from inside the handler closures.
   ##
   ## After `setParser`, `helpName` becomes a valid symbol, but its help storage
-  ## is empty until `buildParser`_ populates it.
+  ## is empty until `macro buildParser`_ populates it.
   ##
   ## Pass the `helpName` symbol directly to the token-taking `buildParser`
   ## overload, don't pass the string name again, as that would redeclare the symbol.
@@ -1188,7 +1193,7 @@ template buildParser*(cfg: static ParserConfig;
 
 template buildParser*(progName, helpName: static string;
                       mode: static CliMode;
-                      body: typed): untyped =
+                      body: untyped): untyped =
   ## Convenience overload using the default `ParserConfig`.
   setParser(helpName)
   buildParser(ParserConfig(), progName, bindSym(helpName), mode, body)

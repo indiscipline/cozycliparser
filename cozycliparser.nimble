@@ -1,5 +1,5 @@
 # Package
-version       = "0.3.0"
+version       = "0.3.1"
 author        = "Kirill I."
 description   = "CLI parser builder, a convenience wrapper over `std/parseopt`"
 license       = "GPL-2.0-or-later"
@@ -13,6 +13,7 @@ import std/[pegs, os, strutils]
 
 const
   SRC = "cozycliparser.nim"
+  URL = "https://github.com/indiscipline/cozycliparser"
   exampleFile = "readmeexample.nim"
   readmeFile = "README.md"
   injectFrom = "<!-- EXAMPLE_START -->"
@@ -43,4 +44,6 @@ task updatereadme, "Runs the example file and injects its source into README.md"
     echo "Nothing to update. (Check injection markers!)"
 
 task updatedocs, "Regenerated `docs/index.html`":
-  exec("nim doc -o:docs/index.html " & SRC)
+  #let tag = staticExec("git describe --tags --abbrev=0").strip()
+  #let commit = staticExec("git rev-parse --short HEAD").strip()
+  exec("nim doc --git.commit:main --git.url:$1 --putenv:nimbleversion=$2 -o:docs/index.html $3" % [URL, version, SRC])
