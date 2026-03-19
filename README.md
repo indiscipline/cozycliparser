@@ -88,7 +88,7 @@ Options:
 # Display colorized help for the program and subcommands with:
 Cli.help.display()
 
-Cli.greet.help.display()
+Cli.help("greet").display()
 ```
 <!-- EXAMPLE_END -->
 
