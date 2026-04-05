@@ -436,16 +436,42 @@ type
 
   HelpPalette* = array[HelpTag, tuple[fg: ForegroundColor, style: set[Style]]]
 
-const DefaultPalette*: HelpPalette = [
-  htPlain:    (fgDefault, {}),
-  htProgName: (fgDefault, {}),
-  htSection:  (fgYellow, {styleDim}),
-  htArg:      (fgCyan, {styleBright}),
-  htMetavar:  (fgCyan, {}),
-  htShortKey: (fgGreen, {styleBright}),
-  htLongKey:  (fgBlue, {styleBright}),
-  htSubCmd:   (fgMagenta, {styleBright})
-]
+const DefaultPalette*: HelpPalette =
+  when defined(windows):
+    [
+      htPlain:    (fgDefault, {}),
+      htProgName: (fgDefault, {}),
+      htSection:  (fgYellow, {styleDim}),
+      htArg:      (fgCyan, {styleBright}),
+      htMetavar:  (fgCyan, {}),
+      htShortKey: (fgGreen, {styleBright}),
+      htLongKey:  (fgBlue, {styleBright}),
+      htSubCmd:   (fgMagenta, {styleBright}) ]
+  else:
+    [
+      htPlain:    (fgDefault, {}),
+      htProgName: (fgDefault, {styleBright}),
+      htSection:  (fgDefault, {styleDim}),
+      htArg:      (fgBlue, {styleBright}),
+      htMetavar:  (fgCyan, {}),
+      htShortKey: (fgGreen, {}),
+      htLongKey:  (fgGreen, {}),
+      htSubCmd:   (fgYellow, {}) ]
+  ## Palette displayed above depends on the OS the docs
+  ## were generated under.
+  ##
+  ## For better `cmd.exe` compatibility, the default
+  ## Windows palette is:
+  ## ```nim
+  ## [htPlain:    (fgDefault, {}),
+  ##  htProgName: (fgDefault, {}),
+  ##  htSection:  (fgYellow, {styleDim}),
+  ##  htArg:      (fgCyan, {styleBright}),
+  ##  htMetavar:  (fgCyan, {}),
+  ##  htShortKey: (fgGreen, {styleBright}),
+  ##  htLongKey:  (fgBlue, {styleBright}),
+  ##  htSubCmd:   (fgMagenta, {styleBright}) ]
+  ## ```
 
 type
   OutStream* = enum
@@ -1329,6 +1355,7 @@ Options:
   doAssert $Cli.help == HelpRoot
   doAssert $Cli.help("filter") == HelpFilter
   showHelp()
+  Cli.help("filter").display(stderr)
 
   const
     HelpSvcRoot = """Usage: svcctl [options] <nginx|postgres>

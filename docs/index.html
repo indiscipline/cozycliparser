@@ -62,6 +62,7 @@
 <li><a class="reference" id="cozycliparsercolon-commandminusline-parser-builder-subcommands_toc" href="#cozycliparsercolon-commandminusline-parser-builder-subcommands">Subcommands</a></li>
 <li><a class="reference" id="cozycliparsercolon-commandminusline-parser-builder-default-values_toc" href="#cozycliparsercolon-commandminusline-parser-builder-default-values">Default values</a></li>
 <li><a class="reference" id="cozycliparsercolon-commandminusline-parser-builder-error-handling_toc" href="#cozycliparsercolon-commandminusline-parser-builder-error-handling">Error handling</a></li>
+<li><a class="reference" id="cozycliparsercolon-commandminusline-parser-builder-sharing-registration-logic_toc" href="#cozycliparsercolon-commandminusline-parser-builder-sharing-registration-logic">Sharing registration logic</a></li>
 <li><a class="reference" id="cozycliparsercolon-commandminusline-parser-builder-principle-of-operation_toc" href="#cozycliparsercolon-commandminusline-parser-builder-principle-of-operation">Principle of operation</a></li>
 </ul><li>
   <details open>
@@ -119,10 +120,10 @@
   errorStream*: OutStream = osStderr
   fmtIndent*: int = 2
   fmtColSep*: int = 2        ## minimal help text alignment shift
-  palette*: HelpPalette = [(fgDefault, {}), (fgDefault, {}),
-                           (fgYellow, {styleDim}), (fgCyan, {styleBright}),
-                           (fgCyan, {}), (fgGreen, {styleBright}),
-                           (fgBlue, {styleBright}), (fgMagenta, {styleBright})]
+  palette*: HelpPalette = [(fgDefault, {}), (fgDefault, {styleBright}),
+                           (fgDefault, {styleDim}), (fgBlue, {styleBright}),
+                           (fgCyan, {}), (fgGreen, {}), (fgGreen, {}),
+                           (fgYellow, {})]
   debug*: bool = false       ## print the expanded macro AST at compile time">ParserConfig</a></li>
 
     </ul>
@@ -141,11 +142,10 @@
   <details open>
     <summary><a class="reference reference-toplevel" href="#10" id="60">Consts</a></summary>
     <ul class="simple simple-toc-section">
-      <li><a class="reference" href="#DefaultPalette" title="DefaultPalette: HelpPalette = [(fgDefault, {}), (fgDefault, {}),
-                               (fgYellow, {styleDim}), (fgCyan, {styleBright}),
-                               (fgCyan, {}), (fgGreen, {styleBright}),
-                               (fgBlue, {styleBright}),
-                               (fgMagenta, {styleBright})]">DefaultPalette</a></li>
+      <li><a class="reference" href="#DefaultPalette" title="DefaultPalette: HelpPalette = [(fgDefault, {}), (fgDefault, {styleBright}),
+                               (fgDefault, {styleDim}),
+                               (fgBlue, {styleBright}), (fgCyan, {}),
+                               (fgGreen, {}), (fgGreen, {}), (fgYellow, {})]">DefaultPalette</a></li>
 
     </ul>
   </details>
@@ -160,11 +160,11 @@
 
 </ul>
 <ul class="simple nested-toc-section">arg
-  <li><a class="reference" href="#arg%2Cstring%2Cstring%2CArgHandler" title="arg(name, help: string; handler: ArgHandler)">arg(name, help: string; handler: ArgHandler)</a></li>
+  <li><a class="reference" href="#arg%2Cstaticstring%2Cstaticstring%2CArgHandler" title="arg(name, help: static string; handler: ArgHandler)">arg(name, help: static string; handler: ArgHandler)</a></li>
 
 </ul>
 <ul class="simple nested-toc-section">cmd
-  <li><a class="reference" href="#cmd%2Cstring%2Cstring%2Cproc%29" title="cmd(name, help: string; cmdRegistrations: proc ())">cmd(name, help: string; cmdRegistrations: proc ())</a></li>
+  <li><a class="reference" href="#cmd%2Cstaticstring%2Cstaticstring%2Cproc%29" title="cmd(name, help: static string; cmdRegistrations: proc ())">cmd(name, help: static string; cmdRegistrations: proc ())</a></li>
 
 </ul>
 <ul class="simple nested-toc-section">display
@@ -177,7 +177,7 @@
 
 </ul>
 <ul class="simple nested-toc-section">flag
-  <li><a class="reference" href="#flag%2Cchar%2Cstring%2Cstring%2CFlagHandler" title="flag(short: char; name, help: string; handler: FlagHandler)">flag(short: char; name, help: string; handler: FlagHandler)</a></li>
+  <li><a class="reference" href="#flag%2Cchar%2Cstaticstring%2Cstaticstring%2CFlagHandler" title="flag(short: char; name, help: static string; handler: FlagHandler)">flag(short: char; name, help: static string; handler: FlagHandler)</a></li>
 
 </ul>
 <ul class="simple nested-toc-section">helpInterpolator
@@ -191,7 +191,7 @@
 
 </ul>
 <ul class="simple nested-toc-section">opt
-  <li><a class="reference" href="#opt%2Cchar%2Cstring%2Cstring%2Cstring%2COptHandler" title="opt(short: char; name, help, metavar: string; handler: OptHandler)">opt(short: char; name, help, metavar: string; handler: OptHandler)</a></li>
+  <li><a class="reference" href="#opt%2Cchar%2Cstaticstring%2Cstaticstring%2Cstaticstring%2COptHandler" title="opt(short: char; name, help, metavar: static string; handler: OptHandler)">opt(short: char; name, help, metavar: static string; handler: OptHandler)</a></li>
 
 </ul>
 <ul class="simple nested-toc-section">parserConfig
@@ -199,23 +199,21 @@
              helpText = &quot;Show this help and exit&quot;; helpStream = osStdout;
              helpExitCode = 0; useColors = true; errorExitCode = 1;
              errorShowHelp = true; errorStream = osStderr; fmtIndent = 2;
-             fmtColSep = 2; palette = [(fgDefault, {}), (fgDefault, {}),
-                                       (fgYellow, {styleDim}),
-                                       (fgCyan, {styleBright}), (fgCyan, {}),
-                                       (fgGreen, {styleBright}),
-                                       (fgBlue, {styleBright}),
-                                       (fgMagenta, {styleBright})];
-             debug = false): ParserConfig">parserConfig(helpPrefix = &quot;&quot;; helpAuto = true; helpFlag = ('h', &quot;help&quot;);
+             fmtColSep = 2; palette = [(fgDefault, {}),
+                                       (fgDefault, {styleBright}),
+                                       (fgDefault, {styleDim}),
+                                       (fgBlue, {styleBright}), (fgCyan, {}),
+                                       (fgGreen, {}), (fgGreen, {}),
+                                       (fgYellow, {})]; debug = false): ParserConfig">parserConfig(helpPrefix = &quot;&quot;; helpAuto = true; helpFlag = ('h', &quot;help&quot;);
              helpText = &quot;Show this help and exit&quot;; helpStream = osStdout;
              helpExitCode = 0; useColors = true; errorExitCode = 1;
              errorShowHelp = true; errorStream = osStderr; fmtIndent = 2;
-             fmtColSep = 2; palette = [(fgDefault, {}), (fgDefault, {}),
-                                       (fgYellow, {styleDim}),
-                                       (fgCyan, {styleBright}), (fgCyan, {}),
-                                       (fgGreen, {styleBright}),
-                                       (fgBlue, {styleBright}),
-                                       (fgMagenta, {styleBright})];
-             debug = false): ParserConfig</a></li>
+             fmtColSep = 2; palette = [(fgDefault, {}),
+                                       (fgDefault, {styleBright}),
+                                       (fgDefault, {styleDim}),
+                                       (fgBlue, {styleBright}), (fgCyan, {}),
+                                       (fgGreen, {}), (fgGreen, {}),
+                                       (fgYellow, {})]; debug = false): ParserConfig</a></li>
 
 </ul>
 <ul class="simple nested-toc-section">run
@@ -253,7 +251,7 @@
     <summary><a class="reference reference-toplevel" href="#18" id="68">Templates</a></summary>
     <ul class="simple simple-toc-section">
       <ul class="simple nested-toc-section">argreg
-  <li><a class="reference" href="#argreg.t%2Cstring%2Cstring%2Cuntyped" title="argreg(name, help: string; body: untyped)">argreg(name, help: string; body: untyped)</a></li>
+  <li><a class="reference" href="#argreg.t%2Cstaticstring%2Cstaticstring%2Cuntyped" title="argreg(name, help: static string; body: untyped)">argreg(name, help: static string; body: untyped)</a></li>
 
 </ul>
 <ul class="simple nested-toc-section">buildParser
@@ -269,11 +267,11 @@
 
 </ul>
 <ul class="simple nested-toc-section">command
-  <li><a class="reference" href="#command.t%2Cstring%2Cstring%2Cuntyped" title="command(name, help: string; body: untyped)">command(name, help: string; body: untyped)</a></li>
+  <li><a class="reference" href="#command.t%2Cstaticstring%2Cstaticstring%2Cuntyped" title="command(name, help: static string; body: untyped)">command(name, help: static string; body: untyped)</a></li>
 
 </ul>
 <ul class="simple nested-toc-section">flagreg
-  <li><a class="reference" href="#flagreg.t%2Cchar%2Cstring%2Cstring%2Cuntyped" title="flagreg(short: char; name, help: string; body: untyped)">flagreg(short: char; name, help: string; body: untyped)</a></li>
+  <li><a class="reference" href="#flagreg.t%2Cchar%2Cstaticstring%2Cstaticstring%2Cuntyped" title="flagreg(short: char; name, help: static string; body: untyped)">flagreg(short: char; name, help: static string; body: untyped)</a></li>
 
 </ul>
 <ul class="simple nested-toc-section">help
@@ -283,7 +281,7 @@
 
 </ul>
 <ul class="simple nested-toc-section">optreg
-  <li><a class="reference" href="#optreg.t%2Cchar%2Cstring%2Cstring%2Cstring%2Cuntyped" title="optreg(short: char; name, help, metavar: string; body: untyped)">optreg(short: char; name, help, metavar: string; body: untyped)</a></li>
+  <li><a class="reference" href="#optreg.t%2Cchar%2Cstaticstring%2Cstaticstring%2Cstaticstring%2Cuntyped" title="optreg(short: char; name, help, metavar: static string; body: untyped)">optreg(short: char; name, help, metavar: static string; body: untyped)</a></li>
 
 </ul>
 <ul class="simple nested-toc-section">runreg
@@ -311,7 +309,7 @@
     <div id="tocRoot"></div>
     
     <p class="module-desc">
-<h1><a class="toc-backref" id="cozycliparsercolon-commandminusline-parser-builder" href="#cozycliparsercolon-commandminusline-parser-builder">cozycliparser: Command-Line Parser Builder</a></h1><table class="docinfo" frame="void" rules="none"><col class="docinfo-name" /><col class="docinfo-content" /><tbody valign="top"><tr><th class="docinfo-name">Version:</th><td>0.3.1</td></tr>
+<h1><a class="toc-backref" id="cozycliparsercolon-commandminusline-parser-builder" href="#cozycliparsercolon-commandminusline-parser-builder">cozycliparser: Command-Line Parser Builder</a></h1><table class="docinfo" frame="void" rules="none"><col class="docinfo-name" /><col class="docinfo-content" /><tbody valign="top"><tr><th class="docinfo-name">Version:</th><td>0.3.2</td></tr>
 </tbody></table><p>A thin but useful wrapper over <tt class="docutils literal"><span class="pre"><span class="Identifier">std</span><span class="Operator">/</span><span class="Identifier">parseopt</span></span></tt>.</p>
 <p>Features:</p>
 <ul class="simple"><li>A single place to declare options, flags and arguments - not three (parser, help text, shortNoVal/longNoVal set and seq).</li>
@@ -326,7 +324,7 @@
             mode: static CliMode; body: typed): untyped" href="#buildParser.m,staticParserConfig,staticstring,CliHelp,staticCliMode,typed">macro buildParser</a>, which generates the command-line parser from a set of regular, fully type-checked procedure calls and option-handling closures.</p>
 
 <h2><a class="toc-backref" id="cozycliparsercolon-commandminusline-parser-builder-quick-start" href="#cozycliparsercolon-commandminusline-parser-builder-quick-start">Quick start</a></h2><p>Call <a class="reference internal nimdoc" title="macro buildParser(cfg: static ParserConfig; progName: static string; token: CliHelp;
-            mode: static CliMode; body: typed): untyped" href="#buildParser.m,staticParserConfig,staticstring,CliHelp,staticCliMode,typed">macro buildParser</a> with a program name, a help token name, a parser mode, and a declarative body. The <a class="reference internal nimdoc" title="proc opt(short: char; name, help, metavar: string; handler: OptHandler)" href="#opt,char,string,string,string,OptHandler">opt</a>, <a class="reference internal nimdoc" title="proc flag(short: char; name, help: string; handler: FlagHandler)" href="#flag,char,string,string,FlagHandler">flag</a>, <a class="reference internal nimdoc" title="proc arg(name, help: string; handler: ArgHandler)" href="#arg,string,string,ArgHandler">arg</a> and <a class="reference internal nimdoc" title="proc cmd(name, help: string; cmdRegistrations: proc ())" href="#cmd,string,string,proc)">cmd</a> routines register options, flags, positional arguments and subcommands along with their handlers - closures passed as the last argument. The handlers are invoked when the parser meets the corresponding input. </p>
+            mode: static CliMode; body: typed): untyped" href="#buildParser.m,staticParserConfig,staticstring,CliHelp,staticCliMode,typed">macro buildParser</a> with a program name, a help token name, a parser mode, and a declarative body. The <a class="reference internal nimdoc" title="proc opt(short: char; name, help, metavar: static string; handler: OptHandler)" href="#opt,char,staticstring,staticstring,staticstring,OptHandler">opt</a>, <a class="reference internal nimdoc" title="proc flag(short: char; name, help: static string; handler: FlagHandler)" href="#flag,char,staticstring,staticstring,FlagHandler">flag</a>, <a class="reference internal nimdoc" title="proc arg(name, help: static string; handler: ArgHandler)" href="#arg,staticstring,staticstring,ArgHandler">arg</a> and <a class="reference internal nimdoc" title="proc cmd(name, help: static string; cmdRegistrations: proc ())" href="#cmd,staticstring,staticstring,proc)">cmd</a> routines register options, flags, positional arguments and subcommands along with their handlers - closures passed as the last argument. The handlers are invoked when the parser meets the corresponding input. </p>
 
 <p><strong class="examples_text">Example:</strong></p>
 <pre class="listing"><span class="Keyword">import</span> <span class="Identifier">cozycliparser</span>
@@ -396,7 +394,7 @@ By default (<tt class="docutils literal"><span class="pre"><span class="Identifi
 <span class="Keyword">discard</span> <span class="Operator">$</span><span class="Identifier">Cli</span><span class="Operator">.</span><span class="Identifier">help</span>             <span class="Comment"># plain string</span>
 <span class="Identifier">Cli</span><span class="Operator">.</span><span class="Identifier">help</span><span class="Operator">.</span><span class="Identifier">display</span><span class="Punctuation">(</span><span class="Punctuation">)</span>            <span class="Comment"># styled output to stdout</span>
 <span class="Identifier">Cli</span><span class="Operator">.</span><span class="Identifier">help</span><span class="Operator">.</span><span class="Identifier">display</span><span class="Punctuation">(</span><span class="Identifier">stderr</span><span class="Punctuation">)</span>      <span class="Comment"># styled output to stderr</span></pre><div class="admonition admonition-info"><span class="admonition-info-text"><b>Note:</b></span>
-&quot;bare&quot; subcommands with only a <a class="reference internal nimdoc" title="proc run(handler: CmdRunHandler)" href="#run,CmdRunHandler">run</a> handler and no <a class="reference internal nimdoc" title="proc arg(name, help: string; handler: ArgHandler)" href="#arg,string,string,ArgHandler">arg</a>, <a class="reference internal nimdoc" title="proc opt(short: char; name, help, metavar: string; handler: OptHandler)" href="#opt,char,string,string,string,OptHandler">opt</a>, or <a class="reference internal nimdoc" title="proc flag(short: char; name, help: string; handler: FlagHandler)" href="#flag,char,string,string,FlagHandler">flag</a> registrations do not receive a help entry. Accessing their path via <tt class="docutils literal"><span class="pre"><span class="Identifier">Cli</span><span class="Operator">.</span><span class="Identifier">help</span><span class="Punctuation">(</span><span class="StringLit">&quot;path&quot;</span><span class="Punctuation">)</span></span></tt> returns the help text of their parent level.</div>
+&quot;bare&quot; subcommands with only a <a class="reference internal nimdoc" title="proc run(handler: CmdRunHandler)" href="#run,CmdRunHandler">run</a> handler and no <a class="reference internal nimdoc" title="proc arg(name, help: static string; handler: ArgHandler)" href="#arg,staticstring,staticstring,ArgHandler">arg</a>, <a class="reference internal nimdoc" title="proc opt(short: char; name, help, metavar: static string; handler: OptHandler)" href="#opt,char,staticstring,staticstring,staticstring,OptHandler">opt</a>, or <a class="reference internal nimdoc" title="proc flag(short: char; name, help: static string; handler: FlagHandler)" href="#flag,char,staticstring,staticstring,FlagHandler">flag</a> registrations do not receive a help entry. Accessing their path via <tt class="docutils literal"><span class="pre"><span class="Identifier">Cli</span><span class="Operator">.</span><span class="Identifier">help</span><span class="Punctuation">(</span><span class="StringLit">&quot;path&quot;</span><span class="Punctuation">)</span></span></tt> returns the help text of their parent level.</div>
 <p>If you need to reference the token <em>before</em> <tt class="docutils literal"><span class="pre"><span class="Identifier">buildParser</span></span></tt> runs -- for example, to define a helper proc that displays help and is called from inside a handler closure -- declare the token first with <a class="reference internal nimdoc" title="macro setParser(helpName: static string): untyped" href="#setParser.m,staticstring">setParser</a>: </p>
 
 <p><strong class="examples_text">Example: cmd: -r:off</strong></p>
@@ -557,6 +555,35 @@ Options:
 </ul>
 <p>There is one <tt class="docutils literal"><span class="pre"><span class="Identifier">onError</span></span></tt> handler per parser; <tt class="docutils literal"><span class="pre"><span class="Identifier">e</span><span class="Operator">.</span><span class="Identifier">path</span></span></tt> and <tt class="docutils literal"><span class="pre"><span class="Identifier">e</span><span class="Operator">.</span><span class="Identifier">help</span></span></tt> distinguish which level triggered the error.</p>
 
+<h2><a class="toc-backref" id="cozycliparsercolon-commandminusline-parser-builder-sharing-registration-logic" href="#cozycliparsercolon-commandminusline-parser-builder-sharing-registration-logic">Sharing registration logic</a></h2><p>When multiple subcommands share the same set of sub-options, flags, or nested commands, you can avoid repetition by declaring the shared registrations in a template or proc and calling it inside each <tt class="docutils literal"><span class="pre"><span class="Identifier">cmd</span></span></tt> closure.</p>
+<p><strong>Template</strong> - expanded at each call site, so any captured variables are substituted as literals. The compiler sees the expanded registration calls directly, which means help text expressions can reference the template parameters freely: </p>
+
+<p><strong class="examples_text">Example: cmd: -r:off</strong></p>
+<pre class="listing"><span class="Keyword">import</span> <span class="Identifier">cozycliparser</span>
+<span class="Keyword">var</span> <span class="Identifier">currentService</span><span class="Punctuation">:</span> <span class="Identifier">string</span>
+
+<span class="Keyword">template</span> <span class="Identifier">registerActions</span><span class="Punctuation">(</span><span class="Identifier">svc</span><span class="Punctuation">:</span> <span class="Keyword">static</span> <span class="Identifier">string</span><span class="Punctuation">)</span> <span class="Operator">=</span>
+  <span class="Identifier">cmd</span><span class="Punctuation">(</span><span class="StringLit">&quot;start&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;Start &quot;</span> <span class="Operator">&amp;</span> <span class="Identifier">svc</span><span class="Punctuation">)</span> <span class="Keyword">do</span> <span class="Punctuation">(</span><span class="Punctuation">)</span><span class="Punctuation">:</span>
+    <span class="Identifier">run</span> <span class="Keyword">do</span> <span class="Punctuation">(</span><span class="Punctuation">)</span><span class="Punctuation">:</span> <span class="Identifier">currentService</span> <span class="Operator">=</span> <span class="Identifier">svc</span>
+  <span class="Identifier">cmd</span><span class="Punctuation">(</span><span class="StringLit">&quot;stop&quot;</span><span class="Punctuation">,</span>  <span class="StringLit">&quot;Stop &quot;</span>  <span class="Operator">&amp;</span> <span class="Identifier">svc</span><span class="Punctuation">)</span> <span class="Keyword">do</span> <span class="Punctuation">(</span><span class="Punctuation">)</span><span class="Punctuation">:</span>
+    <span class="Identifier">run</span> <span class="Keyword">do</span> <span class="Punctuation">(</span><span class="Punctuation">)</span><span class="Punctuation">:</span> <span class="Identifier">currentService</span> <span class="Operator">=</span> <span class="Identifier">svc</span>
+
+<span class="Identifier">buildParser</span><span class="Punctuation">(</span><span class="StringLit">&quot;svcctl&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;Cli&quot;</span><span class="Punctuation">,</span> <span class="Identifier">GnuMode</span><span class="Punctuation">)</span><span class="Punctuation">:</span>
+  <span class="Identifier">cmd</span><span class="Punctuation">(</span><span class="StringLit">&quot;nginx&quot;</span><span class="Punctuation">,</span>    <span class="StringLit">&quot;Manage nginx&quot;</span><span class="Punctuation">)</span>    <span class="Keyword">do</span> <span class="Punctuation">(</span><span class="Punctuation">)</span><span class="Punctuation">:</span> <span class="Identifier">registerActions</span><span class="Punctuation">(</span><span class="StringLit">&quot;nginx&quot;</span><span class="Punctuation">)</span>
+  <span class="Identifier">cmd</span><span class="Punctuation">(</span><span class="StringLit">&quot;postgres&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;Manage postgres&quot;</span><span class="Punctuation">)</span> <span class="Keyword">do</span> <span class="Punctuation">(</span><span class="Punctuation">)</span><span class="Punctuation">:</span> <span class="Identifier">registerActions</span><span class="Punctuation">(</span><span class="StringLit">&quot;postgres&quot;</span><span class="Punctuation">)</span></pre><strong>Proc</strong> - the body is traversed at compile time so the macro sees the nested registrations for help generation. This produces slightly less code (the proc is not inlined but called at runtime), but unique handling closures are instantiated for each use of <tt class="docutils literal"><span class="pre"><span class="Identifier">registerActions</span></span></tt> in both cases. 
+<p><strong class="examples_text">Example: cmd: -r:off</strong></p>
+<pre class="listing"><span class="Keyword">import</span> <span class="Identifier">cozycliparser</span>
+<span class="Keyword">var</span> <span class="Identifier">currentService</span><span class="Punctuation">:</span> <span class="Identifier">string</span>
+
+<span class="Keyword">proc</span> <span class="Identifier">registerActions</span><span class="Punctuation">(</span><span class="Identifier">svc</span><span class="Punctuation">:</span> <span class="Identifier">string</span><span class="Punctuation">)</span> <span class="Operator">=</span>
+  <span class="Identifier">cmd</span><span class="Punctuation">(</span><span class="StringLit">&quot;start&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;Start the service&quot;</span><span class="Punctuation">)</span> <span class="Keyword">do</span> <span class="Punctuation">(</span><span class="Punctuation">)</span><span class="Punctuation">:</span>
+    <span class="Identifier">run</span> <span class="Keyword">do</span> <span class="Punctuation">(</span><span class="Punctuation">)</span><span class="Punctuation">:</span> <span class="Identifier">currentService</span> <span class="Operator">=</span> <span class="Identifier">svc</span>
+  <span class="Identifier">cmd</span><span class="Punctuation">(</span><span class="StringLit">&quot;stop&quot;</span><span class="Punctuation">,</span>  <span class="StringLit">&quot;Stop the service&quot;</span><span class="Punctuation">)</span>  <span class="Keyword">do</span> <span class="Punctuation">(</span><span class="Punctuation">)</span><span class="Punctuation">:</span>
+    <span class="Identifier">run</span> <span class="Keyword">do</span> <span class="Punctuation">(</span><span class="Punctuation">)</span><span class="Punctuation">:</span> <span class="Identifier">currentService</span> <span class="Operator">=</span> <span class="Identifier">svc</span>
+
+<span class="Identifier">buildParser</span><span class="Punctuation">(</span><span class="StringLit">&quot;svcctl&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;Cli&quot;</span><span class="Punctuation">,</span> <span class="Identifier">GnuMode</span><span class="Punctuation">)</span><span class="Punctuation">:</span>
+  <span class="Identifier">cmd</span><span class="Punctuation">(</span><span class="StringLit">&quot;nginx&quot;</span><span class="Punctuation">,</span>    <span class="StringLit">&quot;Manage nginx&quot;</span><span class="Punctuation">)</span>    <span class="Keyword">do</span> <span class="Punctuation">(</span><span class="Punctuation">)</span><span class="Punctuation">:</span> <span class="Identifier">registerActions</span><span class="Punctuation">(</span><span class="StringLit">&quot;nginx&quot;</span><span class="Punctuation">)</span>
+  <span class="Identifier">cmd</span><span class="Punctuation">(</span><span class="StringLit">&quot;postgres&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;Manage postgres&quot;</span><span class="Punctuation">)</span> <span class="Keyword">do</span> <span class="Punctuation">(</span><span class="Punctuation">)</span><span class="Punctuation">:</span> <span class="Identifier">registerActions</span><span class="Punctuation">(</span><span class="StringLit">&quot;postgres&quot;</span><span class="Punctuation">)</span></pre>The proc/template bodies must contain only registration calls (<a class="reference internal nimdoc" title="proc opt(short: char; name, help, metavar: static string; handler: OptHandler)" href="#opt,char,staticstring,staticstring,staticstring,OptHandler">opt</a>, <a class="reference internal nimdoc" title="proc flag(short: char; name, help: static string; handler: FlagHandler)" href="#flag,char,staticstring,staticstring,FlagHandler">flag</a>, <a class="reference internal nimdoc" title="proc arg(name, help: static string; handler: ArgHandler)" href="#arg,staticstring,staticstring,ArgHandler">arg</a>, <a class="reference internal nimdoc" title="proc run(handler: CmdRunHandler)" href="#run,CmdRunHandler">run</a>, <a class="reference internal nimdoc" title="proc cmd(name, help: static string; cmdRegistrations: proc ())" href="#cmd,staticstring,staticstring,proc)">cmd</a>). Any other statement is a compile-time error.
 <h2><a class="toc-backref" id="cozycliparsercolon-commandminusline-parser-builder-principle-of-operation" href="#cozycliparsercolon-commandminusline-parser-builder-principle-of-operation">Principle of operation</a></h2><p><tt class="docutils literal"><span class="pre"><span class="Identifier">buildParser</span></span></tt> does the following:</p>
 <ol class="simple"><li>Walks the body AST recursively, following cmd closure nesting, collecting opt/flag/arg/run/cmd metadata into a Scope tree.</li>
 <li>Emits one <tt class="docutils literal"><span class="pre"><span class="Keyword">const</span> <span class="Operator">&lt;</span><span class="Identifier">sym</span><span class="Operator">&gt;:</span> <span class="Identifier">HelpText</span></span></tt> per parser level (compile-time constant).</li>
@@ -576,8 +603,8 @@ Options:
   <dd>
     
     
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L470" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L470" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L545" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L545" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -586,8 +613,8 @@ Options:
   <dd>
     
     Phantom token minted once per <a class="reference internal nimdoc" title="macro setParser(helpName: static string): untyped" href="#setParser.m,staticstring">setParser</a> call. <tt class="docutils literal"><span class="pre"><span class="Identifier">Tag</span></span></tt> is the user-visible name; <tt class="docutils literal"><span class="pre"><span class="Identifier">Id</span></span></tt> is a unique gensym'd type that isolates per-call storage so same-named tokens from different modules never collide.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L455" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L455" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L530" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L530" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -596,8 +623,8 @@ Options:
   <dd>
     
     
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L471" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L471" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L546" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L546" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -606,8 +633,8 @@ Options:
   <dd>
     
     
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L487" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L487" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L562" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L562" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -616,8 +643,8 @@ Options:
   <dd>
     
     
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L469" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L469" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L544" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L544" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -635,8 +662,8 @@ Options:
   <dd>
     
     
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L473" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L473" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L548" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L548" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -645,8 +672,8 @@ Options:
   <dd>
     
     
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L388" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L388" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L437" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L437" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -657,8 +684,8 @@ Options:
   <dd>
     
     
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L379" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L379" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L428" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L428" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -675,8 +702,8 @@ Options:
   <dd>
     
     Semantic tags applied to help text spans for styling purposes. <tt class="docutils literal"><span class="pre"><span class="Identifier">htPlain</span></span></tt> spans are passed through the interpolator; all others are not.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L367" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L367" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L416" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L416" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -685,8 +712,8 @@ Options:
   <dd>
     
     
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L383" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L383" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L432" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L432" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -696,8 +723,8 @@ Options:
   <dd>
     
     A <tt class="docutils literal"><span class="pre"><span class="Identifier">HelpText</span></span></tt> bound to a specific parser token. <tt class="docutils literal"><span class="pre"><span class="Operator">$</span></span></tt> and <a class="reference internal nimdoc" title="proc display (2 overloads)" href="#display-procs-all">display</a> on a <tt class="docutils literal"><span class="pre"><span class="Identifier">HelpView</span></span></tt> automatically apply the interpolator registered on the same token, unlike calling them on a bare <tt class="docutils literal"><span class="pre"><span class="Identifier">HelpText</span></span></tt>.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L502" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L502" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L577" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L577" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -706,8 +733,8 @@ Options:
   <dd>
     
     
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L468" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L468" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L543" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L543" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -717,8 +744,8 @@ Options:
   <dd>
     
     Output stream selector for use in <a class="reference internal nimdoc" title="object ParserConfig" href="#ParserConfig">ParserConfig</a> fields.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L402" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L402" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L477" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L477" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -731,8 +758,8 @@ Options:
   <dd>
     
     Describes an unknown option or argument encountered during parsing.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L480" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L480" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L555" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L555" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -750,10 +777,10 @@ Options:
   <span class="Identifier">errorStream</span><span class="Operator">*</span><span class="Other">:</span> <a href="#OutStream"><span class="Identifier">OutStream</span></a> <span class="Other">=</span> <span class="DecNumber">osStderr</span>
   <span class="Identifier">fmtIndent</span><span class="Operator">*</span><span class="Other">:</span> <span class="Identifier">int</span> <span class="Other">=</span> <span class="DecNumber">2</span>
   <span class="Identifier">fmtColSep</span><span class="Operator">*</span><span class="Other">:</span> <span class="Identifier">int</span> <span class="Other">=</span> <span class="DecNumber">2</span>        <span class="Comment">## minimal help text alignment shift</span>
-  <span class="Identifier">palette</span><span class="Operator">*</span><span class="Other">:</span> <a href="#HelpPalette"><span class="Identifier">HelpPalette</span></a> <span class="Other">=</span> <span class="Other">[</span><span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
-                           <span class="Other">(</span><span class="DecNumber">fgYellow</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleDim</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
-                           <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgGreen</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
-                           <span class="Other">(</span><span class="DecNumber">fgBlue</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgMagenta</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">]</span>
+  <span class="Identifier">palette</span><span class="Operator">*</span><span class="Other">:</span> <a href="#HelpPalette"><span class="Identifier">HelpPalette</span></a> <span class="Other">=</span> <span class="Other">[</span><span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
+                           <span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleDim</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgBlue</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
+                           <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgGreen</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgGreen</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
+                           <span class="Other">(</span><span class="DecNumber">fgYellow</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">]</span>
   <span class="Identifier">debug</span><span class="Operator">*</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other">=</span> <span class="DecNumber">false</span>       <span class="Comment">## print the expanded macro AST at compile time</span></pre></dt>
   <dd>
     
@@ -762,15 +789,14 @@ Options:
              helpText = &quot;Show this help and exit&quot;; helpStream = osStdout;
              helpExitCode = 0; useColors = true; errorExitCode = 1;
              errorShowHelp = true; errorStream = osStderr; fmtIndent = 2;
-             fmtColSep = 2; palette = [(fgDefault, {}), (fgDefault, {}),
-                                       (fgYellow, {styleDim}),
-                                       (fgCyan, {styleBright}), (fgCyan, {}),
-                                       (fgGreen, {styleBright}),
-                                       (fgBlue, {styleBright}),
-                                       (fgMagenta, {styleBright})];
-             debug = false): ParserConfig" href="#parserConfig,string,(char, string),string,enum,int,int,enum,int,int,array[HelpTag, tuple[fg: ForegroundColor, style: set[Style]]]">parserConfig</a> proc to selectively override the defaults.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L407" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L407" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+             fmtColSep = 2; palette = [(fgDefault, {}),
+                                       (fgDefault, {styleBright}),
+                                       (fgDefault, {styleDim}),
+                                       (fgBlue, {styleBright}), (fgCyan, {}),
+                                       (fgGreen, {}), (fgGreen, {}),
+                                       (fgYellow, {})]; debug = false): ParserConfig" href="#parserConfig,string,(char, string),string,enum,int,int,enum,int,int,array[HelpTag, tuple[fg: ForegroundColor, style: set[Style]]]">parserConfig</a> proc to selectively override the defaults.
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L482" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L482" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -785,8 +811,8 @@ Options:
   <dd>
     
     Scratch context written by registration procs during <tt class="docutils literal"><span class="pre"><span class="Identifier">buildParser</span></span></tt> body execution. Committed into <tt class="docutils literal"><span class="pre"><span class="Identifier">bpStorage</span></span></tt> by the macro after the body runs.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L516" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L516" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L591" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L591" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -797,16 +823,25 @@ Options:
   <h1><a class="toc-backref" href="#10">Consts</a></h1>
   <dl class="item">
     <div id="DefaultPalette">
-  <dt><pre><a href="#DefaultPalette"><span class="Identifier">DefaultPalette</span></a><span class="Other">:</span> <a href="#HelpPalette"><span class="Identifier">HelpPalette</span></a> <span class="Other">=</span> <span class="Other">[</span><span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
-                               <span class="Other">(</span><span class="DecNumber">fgYellow</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleDim</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
-                               <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgGreen</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
-                               <span class="Other">(</span><span class="DecNumber">fgBlue</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
-                               <span class="Other">(</span><span class="DecNumber">fgMagenta</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">]</span></pre></dt>
+  <dt><pre><a href="#DefaultPalette"><span class="Identifier">DefaultPalette</span></a><span class="Other">:</span> <a href="#HelpPalette"><span class="Identifier">HelpPalette</span></a> <span class="Other">=</span> <span class="Other">[</span><span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
+                               <span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleDim</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
+                               <span class="Other">(</span><span class="DecNumber">fgBlue</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
+                               <span class="Other">(</span><span class="DecNumber">fgGreen</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgGreen</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgYellow</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">]</span></pre></dt>
   <dd>
     
-    
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L390" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L390" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <p>Palette displayed above depends on the OS the docs were generated under.</p>
+<p>For better <tt class="docutils literal"><span class="pre"><span class="Identifier">cmd</span><span class="Operator">.</span><span class="Identifier">exe</span></span></tt> compatibility, the default Windows palette is:</p>
+<p><pre class="listing"><span class="Punctuation">[</span><span class="Identifier">htPlain</span><span class="Punctuation">:</span>    <span class="Punctuation">(</span><span class="Identifier">fgDefault</span><span class="Punctuation">,</span> <span class="Punctuation">{</span><span class="Punctuation">}</span><span class="Punctuation">)</span><span class="Punctuation">,</span>
+ <span class="Identifier">htProgName</span><span class="Punctuation">:</span> <span class="Punctuation">(</span><span class="Identifier">fgDefault</span><span class="Punctuation">,</span> <span class="Punctuation">{</span><span class="Punctuation">}</span><span class="Punctuation">)</span><span class="Punctuation">,</span>
+ <span class="Identifier">htSection</span><span class="Punctuation">:</span>  <span class="Punctuation">(</span><span class="Identifier">fgYellow</span><span class="Punctuation">,</span> <span class="Punctuation">{</span><span class="Identifier">styleDim</span><span class="Punctuation">}</span><span class="Punctuation">)</span><span class="Punctuation">,</span>
+ <span class="Identifier">htArg</span><span class="Punctuation">:</span>      <span class="Punctuation">(</span><span class="Identifier">fgCyan</span><span class="Punctuation">,</span> <span class="Punctuation">{</span><span class="Identifier">styleBright</span><span class="Punctuation">}</span><span class="Punctuation">)</span><span class="Punctuation">,</span>
+ <span class="Identifier">htMetavar</span><span class="Punctuation">:</span>  <span class="Punctuation">(</span><span class="Identifier">fgCyan</span><span class="Punctuation">,</span> <span class="Punctuation">{</span><span class="Punctuation">}</span><span class="Punctuation">)</span><span class="Punctuation">,</span>
+ <span class="Identifier">htShortKey</span><span class="Punctuation">:</span> <span class="Punctuation">(</span><span class="Identifier">fgGreen</span><span class="Punctuation">,</span> <span class="Punctuation">{</span><span class="Identifier">styleBright</span><span class="Punctuation">}</span><span class="Punctuation">)</span><span class="Punctuation">,</span>
+ <span class="Identifier">htLongKey</span><span class="Punctuation">:</span>  <span class="Punctuation">(</span><span class="Identifier">fgBlue</span><span class="Punctuation">,</span> <span class="Punctuation">{</span><span class="Identifier">styleBright</span><span class="Punctuation">}</span><span class="Punctuation">)</span><span class="Punctuation">,</span>
+ <span class="Identifier">htSubCmd</span><span class="Punctuation">:</span>   <span class="Punctuation">(</span><span class="Identifier">fgMagenta</span><span class="Punctuation">,</span> <span class="Punctuation">{</span><span class="Identifier">styleBright</span><span class="Punctuation">}</span><span class="Punctuation">)</span> <span class="Punctuation">]</span></pre></p>
+
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L439" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L439" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -823,49 +858,47 @@ Options:
     
     Converts <tt class="docutils literal"><span class="pre"><span class="Identifier">doc</span></span></tt> to a plain string by concatenating all span text. The registered interpolator is NOT applied; use <tt class="docutils literal"><span class="pre"><span class="Operator">$</span></span></tt> on a <a class="reference internal nimdoc" title="object HelpView" href="#HelpView">HelpView</a> (returned by <a class="reference internal nimdoc" title="template help[Tag: static string; Id](token: CliHelp[Tag, Id]; path: string = &quot;&quot;): HelpView[
     Tag, Id]" href="#help.t,CliHelp[Tag,Id],string">help</a>) to get interpolated output.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L618" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L618" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L693" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L693" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
 <div id="$,HelpView[Tag,Id]">
-  <dt><pre><span class="Keyword">proc</span> <a href="#%24%2CHelpView%5BTag%2CId%5D"><span class="Identifier">`$`</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">:</span> <span class="Identifier">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">v</span><span class="Other">:</span> <a href="#HelpView"><span class="Identifier">HelpView</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">,</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">string</span></pre></dt>
+  <dt><pre><span class="Keyword">proc</span> <a href="#%24%2CHelpView%5BTag%2CId%5D"><span class="Identifier">`$`</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">v</span><span class="Other">:</span> <a href="#HelpView"><span class="Identifier">HelpView</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">,</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">string</span></pre></dt>
   <dd>
     
     Converts <tt class="docutils literal"><span class="pre"><span class="Identifier">v</span></span></tt> to a plain string, applying the registered interpolator.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L647" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L647" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L722" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L722" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
 
 </div>
 <div id="arg-procs-all">
-  <div id="arg,string,string,ArgHandler">
-  <dt><pre><span class="Keyword">proc</span> <a href="#arg%2Cstring%2Cstring%2CArgHandler"><span class="Identifier">arg</span></a><span class="Other">(</span><span class="Identifier">name</span><span class="Other">,</span> <span class="Identifier">help</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">handler</span><span class="Other">:</span> <a href="#ArgHandler"><span class="Identifier">ArgHandler</span></a><span class="Other">)</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span>
-    <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <div id="arg,staticstring,staticstring,ArgHandler">
+  <dt><pre><span class="Keyword">proc</span> <a href="#arg%2Cstaticstring%2Cstaticstring%2CArgHandler"><span class="Identifier">arg</span></a><span class="Other">(</span><span class="Identifier">name</span><span class="Other">,</span> <span class="Identifier">help</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">handler</span><span class="Other">:</span> <a href="#ArgHandler"><span class="Identifier">ArgHandler</span></a><span class="Other">)</span></pre></dt>
   <dd>
     
     Registers a positional argument handler. Multiple <tt class="docutils literal"><span class="pre"><span class="Identifier">arg</span></span></tt> calls are allowed per parser level. Tokens are dispatched in registration order; the last handler absorbs overflow.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L541" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L541" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L616" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L616" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
 
 </div>
 <div id="cmd-procs-all">
-  <div id="cmd,string,string,proc)">
-  <dt><pre><span class="Keyword">proc</span> <a href="#cmd%2Cstring%2Cstring%2Cproc%29"><span class="Identifier">cmd</span></a><span class="Other">(</span><span class="Identifier">name</span><span class="Other">,</span> <span class="Identifier">help</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">cmdRegistrations</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Other">)</span><span class="Other">)</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span>
-    <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">RootEffect</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <div id="cmd,staticstring,staticstring,proc)">
+  <dt><pre><span class="Keyword">proc</span> <a href="#cmd%2Cstaticstring%2Cstaticstring%2Cproc%29"><span class="Identifier">cmd</span></a><span class="Other">(</span><span class="Identifier">name</span><span class="Other">,</span> <span class="Identifier">help</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">cmdRegistrations</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Other">)</span><span class="Other">)</span></pre></dt>
   <dd>
     
     <p>Declares a subcommand. <tt class="docutils literal"><span class="pre"><span class="Identifier">cmdRegistrations</span></span></tt> is called immediately to register the subcommand's own options, flags, args and nested commands, not when the command is met during parsing.</p>
 <p>This, conceptually, declares a parsing level, not a command handler.</p>
-<p>To act on a command during parsing, use <a class="reference internal nimdoc" title="proc run(handler: CmdRunHandler)" href="#run,CmdRunHandler">proc run</a>. Use <a class="reference internal nimdoc" title="proc arg(name, help: string; handler: ArgHandler)" href="#arg,string,string,ArgHandler">arg</a>, <a class="reference internal nimdoc" title="proc flag(short: char; name, help: string; handler: FlagHandler)" href="#flag,char,string,string,FlagHandler">flag</a>, <a class="reference internal nimdoc" title="proc opt(short: char; name, help, metavar: string; handler: OptHandler)" href="#opt,char,string,string,string,OptHandler">opt</a>, <a class="reference internal nimdoc" title="proc run(handler: CmdRunHandler)" href="#run,CmdRunHandler">run</a> or <tt class="docutils literal"><span class="pre"><span class="Identifier">cmd</span></span></tt> itself inside <tt class="docutils literal"><span class="pre"><span class="Identifier">cmdRegistrations</span></span></tt>, as you do at the root parser level.</p>
+<p>To act on a command during parsing, use <a class="reference internal nimdoc" title="proc run(handler: CmdRunHandler)" href="#run,CmdRunHandler">proc run</a>. Use <a class="reference internal nimdoc" title="proc arg(name, help: static string; handler: ArgHandler)" href="#arg,staticstring,staticstring,ArgHandler">arg</a>, <a class="reference internal nimdoc" title="proc flag(short: char; name, help: static string; handler: FlagHandler)" href="#flag,char,staticstring,staticstring,FlagHandler">flag</a>, <a class="reference internal nimdoc" title="proc opt(short: char; name, help, metavar: static string; handler: OptHandler)" href="#opt,char,staticstring,staticstring,staticstring,OptHandler">opt</a>, <a class="reference internal nimdoc" title="proc run(handler: CmdRunHandler)" href="#run,CmdRunHandler">run</a> or <tt class="docutils literal"><span class="pre"><span class="Identifier">cmd</span></span></tt> itself inside <tt class="docutils literal"><span class="pre"><span class="Identifier">cmdRegistrations</span></span></tt>, as you do at the root parser level.</p>
 
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L563" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L563" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L638" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L638" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -880,35 +913,34 @@ Options:
   <dd>
     
     Writes <tt class="docutils literal"><span class="pre"><span class="Identifier">doc</span></span></tt> styled if the terminal supports it, plain otherwise. Respects <tt class="docutils literal"><span class="pre"><span class="Identifier">NO_COLOR</span></span></tt> and <tt class="docutils literal"><span class="pre"><span class="Identifier">CLICOLOR_FORCE</span></span></tt>.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L624" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L624" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L699" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L699" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
 <div id="display,HelpView[Tag,Id],File">
-  <dt><pre><span class="Keyword">proc</span> <a href="#display%2CHelpView%5BTag%2CId%5D%2CFile"><span class="Identifier">display</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">:</span> <span class="Identifier">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">v</span><span class="Other">:</span> <a href="#HelpView"><span class="Identifier">HelpView</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">,</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">f</span><span class="Other">:</span> <span class="Identifier">File</span> <span class="Other">=</span> <span class="Identifier">stdout</span><span class="Other">;</span>
+  <dt><pre><span class="Keyword">proc</span> <a href="#display%2CHelpView%5BTag%2CId%5D%2CFile"><span class="Identifier">display</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">v</span><span class="Other">:</span> <a href="#HelpView"><span class="Identifier">HelpView</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">,</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">f</span><span class="Other">:</span> <span class="Identifier">File</span> <span class="Other">=</span> <span class="Identifier">stdout</span><span class="Other">;</span>
                                      <span class="Identifier">palette</span> <span class="Other">=</span> <span class="Identifier">DefaultPalette</span><span class="Other">)</span></pre></dt>
   <dd>
     
     Displays <tt class="docutils literal"><span class="pre"><span class="Identifier">v</span></span></tt> styled (or plain), applying the registered interpolator.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L652" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L652" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L727" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L727" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
 
 </div>
 <div id="flag-procs-all">
-  <div id="flag,char,string,string,FlagHandler">
-  <dt><pre><span class="Keyword">proc</span> <a href="#flag%2Cchar%2Cstring%2Cstring%2CFlagHandler"><span class="Identifier">flag</span></a><span class="Other">(</span><span class="Identifier">short</span><span class="Other">:</span> <span class="Identifier">char</span><span class="Other">;</span> <span class="Identifier">name</span><span class="Other">,</span> <span class="Identifier">help</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">handler</span><span class="Other">:</span> <a href="#FlagHandler"><span class="Identifier">FlagHandler</span></a><span class="Other">)</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span>
-    <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <div id="flag,char,staticstring,staticstring,FlagHandler">
+  <dt><pre><span class="Keyword">proc</span> <a href="#flag%2Cchar%2Cstaticstring%2Cstaticstring%2CFlagHandler"><span class="Identifier">flag</span></a><span class="Other">(</span><span class="Identifier">short</span><span class="Other">:</span> <span class="Identifier">char</span><span class="Other">;</span> <span class="Identifier">name</span><span class="Other">,</span> <span class="Identifier">help</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">handler</span><span class="Other">:</span> <a href="#FlagHandler"><span class="Identifier">FlagHandler</span></a><span class="Other">)</span></pre></dt>
   <dd>
     
     <p>Registers a boolean flag (<tt class="docutils literal"><span class="pre"><span class="Operator">--</span><span class="Identifier">name</span></span></tt> / <tt class="docutils literal"><span class="pre"><span class="Operator">-</span><span class="Identifier">s</span></span></tt>), fired with no value.</p>
 <p>Pass <tt class="docutils literal"><span class="pre"><span class="CharLit">'\0'</span></span></tt> for <tt class="docutils literal"><span class="pre"><span class="Identifier">short</span></span></tt> to omit the short form; <tt class="docutils literal"><span class="pre"><span class="StringLit">&quot;&quot;</span></span></tt> for <tt class="docutils literal"><span class="pre"><span class="Identifier">name</span></span></tt> to omit the long form.</p>
 
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L530" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L530" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L605" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L605" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -916,13 +948,13 @@ Options:
 </div>
 <div id="helpInterpolator-procs-all">
   <div id="helpInterpolator,CliHelp[Tag,Id],proc(string)">
-  <dt><pre><span class="Keyword">proc</span> <a href="#helpInterpolator%2CCliHelp%5BTag%2CId%5D%2Cproc%28string%29"><span class="Identifier">helpInterpolator</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">:</span> <span class="Identifier">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">token</span><span class="Other">:</span> <a href="#CliHelp"><span class="Identifier">CliHelp</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">,</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">;</span>
+  <dt><pre><span class="Keyword">proc</span> <a href="#helpInterpolator%2CCliHelp%5BTag%2CId%5D%2Cproc%28string%29"><span class="Identifier">helpInterpolator</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">token</span><span class="Other">:</span> <a href="#CliHelp"><span class="Identifier">CliHelp</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">,</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">;</span>
     <span class="Identifier">handler</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span></pre></dt>
   <dd>
     
     Installs a custom interpolator for help text descriptions and prefixes. Evaluated lazily when help text is converted to string or displayed.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L592" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L592" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L667" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L667" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -930,29 +962,28 @@ Options:
 </div>
 <div id="onError-procs-all">
   <div id="onError,CliHelp[Tag,Id],ErrorHandler">
-  <dt><pre><span class="Keyword">proc</span> <a href="#onError%2CCliHelp%5BTag%2CId%5D%2CErrorHandler"><span class="Identifier">onError</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">:</span> <span class="Identifier">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">token</span><span class="Other">:</span> <a href="#CliHelp"><span class="Identifier">CliHelp</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">,</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">;</span>
+  <dt><pre><span class="Keyword">proc</span> <a href="#onError%2CCliHelp%5BTag%2CId%5D%2CErrorHandler"><span class="Identifier">onError</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">token</span><span class="Other">:</span> <a href="#CliHelp"><span class="Identifier">CliHelp</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">,</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">;</span>
                                      <span class="Identifier">handler</span><span class="Other">:</span> <a href="#ErrorHandler"><span class="Identifier">ErrorHandler</span></a><span class="Other">)</span></pre></dt>
   <dd>
     
     <p>Installs a custom unknown-option handler. One handler serves all parser levels. Inspect <tt class="docutils literal"><span class="pre"><span class="Identifier">e</span><span class="Operator">.</span><span class="Identifier">path</span></span></tt> and <tt class="docutils literal"><span class="pre"><span class="Identifier">e</span><span class="Operator">.</span><span class="Identifier">help</span></span></tt> to distinguish the level.</p>
 <p>The default handler writes the unknown option and the relevant help text to <tt class="docutils literal"><span class="pre"><span class="Identifier">stderr</span></span></tt>, then exits with code 1.</p>
 
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L583" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L583" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L658" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L658" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
 
 </div>
 <div id="opt-procs-all">
-  <div id="opt,char,string,string,string,OptHandler">
-  <dt><pre><span class="Keyword">proc</span> <a href="#opt%2Cchar%2Cstring%2Cstring%2Cstring%2COptHandler"><span class="Identifier">opt</span></a><span class="Other">(</span><span class="Identifier">short</span><span class="Other">:</span> <span class="Identifier">char</span><span class="Other">;</span> <span class="Identifier">name</span><span class="Other">,</span> <span class="Identifier">help</span><span class="Other">,</span> <span class="Identifier">metavar</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">handler</span><span class="Other">:</span> <a href="#OptHandler"><span class="Identifier">OptHandler</span></a><span class="Other">)</span> {.
-    <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <div id="opt,char,staticstring,staticstring,staticstring,OptHandler">
+  <dt><pre><span class="Keyword">proc</span> <a href="#opt%2Cchar%2Cstaticstring%2Cstaticstring%2Cstaticstring%2COptHandler"><span class="Identifier">opt</span></a><span class="Other">(</span><span class="Identifier">short</span><span class="Other">:</span> <span class="Identifier">char</span><span class="Other">;</span> <span class="Identifier">name</span><span class="Other">,</span> <span class="Identifier">help</span><span class="Other">,</span> <span class="Identifier">metavar</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">handler</span><span class="Other">:</span> <a href="#OptHandler"><span class="Identifier">OptHandler</span></a><span class="Other">)</span></pre></dt>
   <dd>
     
     Registers a key-value option (<tt class="docutils literal"><span class="pre"><span class="Operator">--</span><span class="Identifier">name</span><span class="Operator">=</span><span class="Identifier">val</span></span></tt> / <tt class="docutils literal"><span class="pre"><span class="Operator">-</span><span class="Identifier">s</span> <span class="Identifier">val</span></span></tt>). Pass <tt class="docutils literal"><span class="pre"><span class="CharLit">'\0'</span></span></tt> for <tt class="docutils literal"><span class="pre"><span class="Identifier">short</span></span></tt> to omit the short form; <tt class="docutils literal"><span class="pre"><span class="StringLit">&quot;&quot;</span></span></tt> for <tt class="docutils literal"><span class="pre"><span class="Identifier">name</span></span></tt> to omit the long form. <tt class="docutils literal"><span class="pre"><span class="Identifier">metavar</span></span></tt> is the value placeholder in usage lines.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L520" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L520" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L595" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L595" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -964,16 +995,16 @@ Options:
                   <span class="Identifier">helpText</span> <span class="Other">=</span> <span class="StringLit">&quot;Show this help and exit&quot;</span><span class="Other">;</span> <span class="Identifier">helpStream</span> <span class="Other">=</span> <span class="DecNumber">osStdout</span><span class="Other">;</span>
                   <span class="Identifier">helpExitCode</span> <span class="Other">=</span> <span class="DecNumber">0</span><span class="Other">;</span> <span class="Identifier">useColors</span> <span class="Other">=</span> <span class="Identifier">true</span><span class="Other">;</span> <span class="Identifier">errorExitCode</span> <span class="Other">=</span> <span class="DecNumber">1</span><span class="Other">;</span>
                   <span class="Identifier">errorShowHelp</span> <span class="Other">=</span> <span class="Identifier">true</span><span class="Other">;</span> <span class="Identifier">errorStream</span> <span class="Other">=</span> <span class="DecNumber">osStderr</span><span class="Other">;</span> <span class="Identifier">fmtIndent</span> <span class="Other">=</span> <span class="DecNumber">2</span><span class="Other">;</span>
-                  <span class="Identifier">fmtColSep</span> <span class="Other">=</span> <span class="DecNumber">2</span><span class="Other">;</span> <span class="Identifier">palette</span> <span class="Other">=</span> <span class="Other">[</span><span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
-    <span class="Other">(</span><span class="DecNumber">fgYellow</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleDim</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
-    <span class="Other">(</span><span class="DecNumber">fgGreen</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgBlue</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
-    <span class="Other">(</span><span class="DecNumber">fgMagenta</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">debug</span> <span class="Other">=</span> <span class="Identifier">false</span><span class="Other">)</span><span class="Other">:</span> <a href="#ParserConfig"><span class="Identifier">ParserConfig</span></a> {.<span class="Identifier">compiletime</span><span class="Other">,</span>
-    <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+                  <span class="Identifier">fmtColSep</span> <span class="Other">=</span> <span class="DecNumber">2</span><span class="Other">;</span> <span class="Identifier">palette</span> <span class="Other">=</span> <span class="Other">[</span><span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
+    <span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgDefault</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleDim</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
+    <span class="Other">(</span><span class="DecNumber">fgBlue</span><span class="Other">,</span> <span class="Other">{</span><span class="DecNumber">styleBright</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgCyan</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgGreen</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span> <span class="Other">(</span><span class="DecNumber">fgGreen</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">,</span>
+    <span class="Other">(</span><span class="DecNumber">fgYellow</span><span class="Other">,</span> <span class="Other">{</span><span class="Other">}</span><span class="Other">)</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">debug</span> <span class="Other">=</span> <span class="Identifier">false</span><span class="Other">)</span><span class="Other">:</span> <a href="#ParserConfig"><span class="Identifier">ParserConfig</span></a> {.<span class="Identifier">compiletime</span><span class="Other">,</span> <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span>
+    <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
     
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L453" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L453" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L528" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L528" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -987,8 +1018,8 @@ Options:
     <p>Registers a closure called once after this parser level's loop finishes. Use it to perform actions in a command's own context immediately after its arguments have been parsed, without tracking state externally.</p>
 <p>Only one <tt class="docutils literal"><span class="pre"><span class="Identifier">run</span></span></tt> handler is allowed per parser level.</p>
 
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L551" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L551" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L626" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L626" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -1001,8 +1032,8 @@ Options:
   <dd>
     
     
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L614" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L614" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L689" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L689" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -1016,13 +1047,13 @@ Options:
   <dl class="item">
     <div id="buildParser-macros-all">
   <div id="buildParser.m,staticParserConfig,staticstring,CliHelp,staticCliMode,typed">
-  <dt><pre><span class="Keyword">macro</span> <a href="#buildParser.m%2CstaticParserConfig%2Cstaticstring%2CCliHelp%2CstaticCliMode%2Ctyped"><span class="Identifier">buildParser</span></a><span class="Other">(</span><span class="Identifier">cfg</span><span class="Other">:</span> <span class="Identifier">static</span> <span class="Identifier">ParserConfig</span><span class="Other">;</span> <span class="Identifier">progName</span><span class="Other">:</span> <span class="Identifier">static</span> <span class="Identifier">string</span><span class="Other">;</span>
-                  <span class="Identifier">token</span><span class="Other">:</span> <a href="#CliHelp"><span class="Identifier">CliHelp</span></a><span class="Other">;</span> <span class="Identifier">mode</span><span class="Other">:</span> <span class="Identifier">static</span> <span class="Identifier">CliMode</span><span class="Other">;</span> <span class="Identifier">body</span><span class="Other">:</span> <span class="Identifier">typed</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">untyped</span></pre></dt>
+  <dt><pre><span class="Keyword">macro</span> <a href="#buildParser.m%2CstaticParserConfig%2Cstaticstring%2CCliHelp%2CstaticCliMode%2Ctyped"><span class="Identifier">buildParser</span></a><span class="Other">(</span><span class="Identifier">cfg</span><span class="Other">:</span> <span class="Keyword">static</span> <a href="#ParserConfig"><span class="Identifier">ParserConfig</span></a><span class="Other">;</span> <span class="Identifier">progName</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">string</span><span class="Other">;</span>
+                  <span class="Identifier">token</span><span class="Other">:</span> <a href="#CliHelp"><span class="Identifier">CliHelp</span></a><span class="Other">;</span> <span class="Identifier">mode</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">CliMode</span><span class="Other">;</span> <span class="Identifier">body</span><span class="Other">:</span> <span class="Identifier">typed</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">untyped</span></pre></dt>
   <dd>
     
-    Generates a complete CLI parser from a declarative body. <tt class="docutils literal"><span class="pre"><span class="Identifier">token</span></span></tt> is the token injected by <a class="reference internal nimdoc" title="macro setParser(helpName: static string): untyped" href="#setParser.m,staticstring">setParser</a>. Only <a class="reference internal nimdoc" title="proc opt(short: char; name, help, metavar: string; handler: OptHandler)" href="#opt,char,string,string,string,OptHandler">opt</a>, <a class="reference internal nimdoc" title="proc flag(short: char; name, help: string; handler: FlagHandler)" href="#flag,char,string,string,FlagHandler">flag</a>, <a class="reference internal nimdoc" title="proc arg(name, help: string; handler: ArgHandler)" href="#arg,string,string,ArgHandler">arg</a>, <a class="reference internal nimdoc" title="proc run(handler: CmdRunHandler)" href="#run,CmdRunHandler">run</a> and <a class="reference internal nimdoc" title="proc cmd(name, help: string; cmdRegistrations: proc ())" href="#cmd,string,string,proc)">cmd</a> calls are allowed in <tt class="docutils literal"><span class="pre"><span class="Identifier">body</span></span></tt>.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L1117" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L1117" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    Generates a complete CLI parser from a declarative body. <tt class="docutils literal"><span class="pre"><span class="Identifier">token</span></span></tt> is the token injected by <a class="reference internal nimdoc" title="macro setParser(helpName: static string): untyped" href="#setParser.m,staticstring">setParser</a>. Only <a class="reference internal nimdoc" title="proc opt(short: char; name, help, metavar: static string; handler: OptHandler)" href="#opt,char,staticstring,staticstring,staticstring,OptHandler">opt</a>, <a class="reference internal nimdoc" title="proc flag(short: char; name, help: static string; handler: FlagHandler)" href="#flag,char,staticstring,staticstring,FlagHandler">flag</a>, <a class="reference internal nimdoc" title="proc arg(name, help: static string; handler: ArgHandler)" href="#arg,staticstring,staticstring,ArgHandler">arg</a>, <a class="reference internal nimdoc" title="proc run(handler: CmdRunHandler)" href="#run,CmdRunHandler">run</a> and <a class="reference internal nimdoc" title="proc cmd(name, help: static string; cmdRegistrations: proc ())" href="#cmd,staticstring,staticstring,proc)">cmd</a> calls are allowed in <tt class="docutils literal"><span class="pre"><span class="Identifier">body</span></span></tt>.
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L1211" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L1211" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -1030,7 +1061,7 @@ Options:
 </div>
 <div id="setParser-macros-all">
   <div id="setParser.m,staticstring">
-  <dt><pre><span class="Keyword">macro</span> <a href="#setParser.m%2Cstaticstring"><span class="Identifier">setParser</span></a><span class="Other">(</span><span class="Identifier">helpName</span><span class="Other">:</span> <span class="Identifier">static</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">untyped</span></pre></dt>
+  <dt><pre><span class="Keyword">macro</span> <a href="#setParser.m%2Cstaticstring"><span class="Identifier">setParser</span></a><span class="Other">(</span><span class="Identifier">helpName</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">untyped</span></pre></dt>
   <dd>
     
     <p>Mints a unique phantom type for this parser call and injects <tt class="docutils literal"><span class="pre"><span class="Keyword">const</span> <span class="Operator">&lt;</span><span class="Identifier">helpName</span><span class="Operator">&gt;:</span> <span class="Identifier">CliHelp</span><span class="Punctuation">[</span><span class="Operator">&lt;</span><span class="Identifier">helpName</span><span class="Operator">&gt;</span><span class="Punctuation">,</span> <span class="Operator">&lt;</span><span class="Identifier">UniqueId</span><span class="Operator">&gt;</span><span class="Punctuation">]</span></span></tt> into the outer scope.</p>
@@ -1039,8 +1070,8 @@ Options:
             mode: static CliMode; body: typed): untyped" href="#buildParser.m,staticParserConfig,staticstring,CliHelp,staticCliMode,typed">macro buildParser</a> populates it.</p>
 <p>Pass the <tt class="docutils literal"><span class="pre"><span class="Identifier">helpName</span></span></tt> symbol directly to the token-taking <tt class="docutils literal"><span class="pre"><span class="Identifier">buildParser</span></span></tt> overload, don't pass the string name again, as that would redeclare the symbol.</p>
 
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L1091" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L1091" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L1185" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L1185" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -1053,13 +1084,13 @@ Options:
   <h1><a class="toc-backref" href="#18">Templates</a></h1>
   <dl class="item">
     <div id="argreg-templates-all">
-  <div id="argreg.t,string,string,untyped">
-  <dt><pre><span class="Keyword">template</span> <a href="#argreg.t%2Cstring%2Cstring%2Cuntyped"><span class="Identifier">argreg</span></a><span class="Other">(</span><span class="Identifier">name</span><span class="Other">,</span> <span class="Identifier">help</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">body</span><span class="Other">:</span> <span class="Identifier">untyped</span><span class="Other">)</span></pre></dt>
+  <div id="argreg.t,staticstring,staticstring,untyped">
+  <dt><pre><span class="Keyword">template</span> <a href="#argreg.t%2Cstaticstring%2Cstaticstring%2Cuntyped"><span class="Identifier">argreg</span></a><span class="Other">(</span><span class="Identifier">name</span><span class="Other">,</span> <span class="Identifier">help</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">body</span><span class="Other">:</span> <span class="Identifier">untyped</span><span class="Other">)</span></pre></dt>
   <dd>
     
-    Convenience wrapper for <a class="reference internal nimdoc" title="proc arg(name, help: string; handler: ArgHandler)" href="#arg,string,string,ArgHandler">arg</a>. Injects <tt class="docutils literal"><span class="pre"><span class="Identifier">key</span></span></tt> for the parsed argument.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L547" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L547" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    Convenience wrapper for <a class="reference internal nimdoc" title="proc arg(name, help: static string; handler: ArgHandler)" href="#arg,staticstring,staticstring,ArgHandler">arg</a>. Injects <tt class="docutils literal"><span class="pre"><span class="Identifier">key</span></span></tt> for the parsed argument.
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L622" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L622" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -1067,62 +1098,62 @@ Options:
 </div>
 <div id="buildParser-templates-all">
   <div id="buildParser.t,staticParserConfig,staticstring,staticstring,staticCliMode,untyped">
-  <dt><pre><span class="Keyword">template</span> <a href="#buildParser.t%2CstaticParserConfig%2Cstaticstring%2Cstaticstring%2CstaticCliMode%2Cuntyped"><span class="Identifier">buildParser</span></a><span class="Other">(</span><span class="Identifier">cfg</span><span class="Other">:</span> <span class="Identifier">static</span> <span class="Identifier">ParserConfig</span><span class="Other">;</span>
-                     <span class="Identifier">progName</span><span class="Other">,</span> <span class="Identifier">helpName</span><span class="Other">:</span> <span class="Identifier">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">mode</span><span class="Other">:</span> <span class="Identifier">static</span> <span class="Identifier">CliMode</span><span class="Other">;</span>
+  <dt><pre><span class="Keyword">template</span> <a href="#buildParser.t%2CstaticParserConfig%2Cstaticstring%2Cstaticstring%2CstaticCliMode%2Cuntyped"><span class="Identifier">buildParser</span></a><span class="Other">(</span><span class="Identifier">cfg</span><span class="Other">:</span> <span class="Keyword">static</span> <a href="#ParserConfig"><span class="Identifier">ParserConfig</span></a><span class="Other">;</span>
+                     <span class="Identifier">progName</span><span class="Other">,</span> <span class="Identifier">helpName</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">mode</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">CliMode</span><span class="Other">;</span>
                      <span class="Identifier">body</span><span class="Other">:</span> <span class="Identifier">untyped</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">untyped</span></pre></dt>
   <dd>
     
     Unified single-call overload. Equivalent to <tt class="docutils literal"><span class="pre"><span class="Identifier">setParser</span><span class="Punctuation">(</span><span class="Identifier">helpName</span><span class="Punctuation">)</span></span></tt> + <tt class="docutils literal"><span class="pre"><span class="Identifier">buildParser</span><span class="Punctuation">(</span><span class="Identifier">cfg</span><span class="Punctuation">,</span> <span class="Identifier">progName</span><span class="Punctuation">,</span> <span class="Operator">&lt;</span><span class="Identifier">token</span><span class="Operator">&gt;</span><span class="Punctuation">,</span> <span class="Identifier">mode</span><span class="Punctuation">,</span> <span class="Identifier">body</span><span class="Punctuation">)</span></span></tt>. Injects <tt class="docutils literal"><span class="pre"><span class="Keyword">const</span> <span class="Operator">&lt;</span><span class="Identifier">helpName</span><span class="Operator">&gt;</span></span></tt> into the outer scope.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L1184" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L1184" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L1278" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L1278" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
 <div id="buildParser.t,staticstring,staticstring,staticCliMode,untyped">
-  <dt><pre><span class="Keyword">template</span> <a href="#buildParser.t%2Cstaticstring%2Cstaticstring%2CstaticCliMode%2Cuntyped"><span class="Identifier">buildParser</span></a><span class="Other">(</span><span class="Identifier">progName</span><span class="Other">,</span> <span class="Identifier">helpName</span><span class="Other">:</span> <span class="Identifier">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">mode</span><span class="Other">:</span> <span class="Identifier">static</span> <span class="Identifier">CliMode</span><span class="Other">;</span>
+  <dt><pre><span class="Keyword">template</span> <a href="#buildParser.t%2Cstaticstring%2Cstaticstring%2CstaticCliMode%2Cuntyped"><span class="Identifier">buildParser</span></a><span class="Other">(</span><span class="Identifier">progName</span><span class="Other">,</span> <span class="Identifier">helpName</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">mode</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">CliMode</span><span class="Other">;</span>
                      <span class="Identifier">body</span><span class="Other">:</span> <span class="Identifier">untyped</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">untyped</span></pre></dt>
   <dd>
     
     Convenience overload using the default <tt class="docutils literal"><span class="pre"><span class="Identifier">ParserConfig</span></span></tt>.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L1194" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L1194" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L1288" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L1288" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
 <div id="buildParser.t,staticstring,CliHelp,staticCliMode,typed">
-  <dt><pre><span class="Keyword">template</span> <a href="#buildParser.t%2Cstaticstring%2CCliHelp%2CstaticCliMode%2Ctyped"><span class="Identifier">buildParser</span></a><span class="Other">(</span><span class="Identifier">progName</span><span class="Other">:</span> <span class="Identifier">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">token</span><span class="Other">:</span> <a href="#CliHelp"><span class="Identifier">CliHelp</span></a><span class="Other">;</span>
-                     <span class="Identifier">mode</span><span class="Other">:</span> <span class="Identifier">static</span> <span class="Identifier">CliMode</span><span class="Other">;</span> <span class="Identifier">body</span><span class="Other">:</span> <span class="Identifier">typed</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">untyped</span></pre></dt>
+  <dt><pre><span class="Keyword">template</span> <a href="#buildParser.t%2Cstaticstring%2CCliHelp%2CstaticCliMode%2Ctyped"><span class="Identifier">buildParser</span></a><span class="Other">(</span><span class="Identifier">progName</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">token</span><span class="Other">:</span> <a href="#CliHelp"><span class="Identifier">CliHelp</span></a><span class="Other">;</span>
+                     <span class="Identifier">mode</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">CliMode</span><span class="Other">;</span> <span class="Identifier">body</span><span class="Other">:</span> <span class="Identifier">typed</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">untyped</span></pre></dt>
   <dd>
     
     Convenience overload using the default <tt class="docutils literal"><span class="pre"><span class="Identifier">ParserConfig</span></span></tt>.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L1177" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L1177" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L1271" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L1271" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
 
 </div>
 <div id="command-templates-all">
-  <div id="command.t,string,string,untyped">
-  <dt><pre><span class="Keyword">template</span> <a href="#command.t%2Cstring%2Cstring%2Cuntyped"><span class="Identifier">command</span></a><span class="Other">(</span><span class="Identifier">name</span><span class="Other">,</span> <span class="Identifier">help</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">body</span><span class="Other">:</span> <span class="Identifier">untyped</span><span class="Other">)</span></pre></dt>
+  <div id="command.t,staticstring,staticstring,untyped">
+  <dt><pre><span class="Keyword">template</span> <a href="#command.t%2Cstaticstring%2Cstaticstring%2Cuntyped"><span class="Identifier">command</span></a><span class="Other">(</span><span class="Identifier">name</span><span class="Other">,</span> <span class="Identifier">help</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">body</span><span class="Other">:</span> <span class="Identifier">untyped</span><span class="Other">)</span></pre></dt>
   <dd>
     
-    Convenience wrapper for <a class="reference internal nimdoc" title="proc cmd(name, help: string; cmdRegistrations: proc ())" href="#cmd,string,string,proc)">cmd</a>.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L579" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L579" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    Convenience wrapper for <a class="reference internal nimdoc" title="proc cmd(name, help: static string; cmdRegistrations: proc ())" href="#cmd,staticstring,staticstring,proc)">cmd</a>.
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L654" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L654" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
 
 </div>
 <div id="flagreg-templates-all">
-  <div id="flagreg.t,char,string,string,untyped">
-  <dt><pre><span class="Keyword">template</span> <a href="#flagreg.t%2Cchar%2Cstring%2Cstring%2Cuntyped"><span class="Identifier">flagreg</span></a><span class="Other">(</span><span class="Identifier">short</span><span class="Other">:</span> <span class="Identifier">char</span><span class="Other">;</span> <span class="Identifier">name</span><span class="Other">,</span> <span class="Identifier">help</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">body</span><span class="Other">:</span> <span class="Identifier">untyped</span><span class="Other">)</span></pre></dt>
+  <div id="flagreg.t,char,staticstring,staticstring,untyped">
+  <dt><pre><span class="Keyword">template</span> <a href="#flagreg.t%2Cchar%2Cstaticstring%2Cstaticstring%2Cuntyped"><span class="Identifier">flagreg</span></a><span class="Other">(</span><span class="Identifier">short</span><span class="Other">:</span> <span class="Identifier">char</span><span class="Other">;</span> <span class="Identifier">name</span><span class="Other">,</span> <span class="Identifier">help</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">body</span><span class="Other">:</span> <span class="Identifier">untyped</span><span class="Other">)</span></pre></dt>
   <dd>
     
-    Convenience wrapper for <a class="reference internal nimdoc" title="proc flag(short: char; name, help: string; handler: FlagHandler)" href="#flag,char,string,string,FlagHandler">flag</a>.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L537" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L537" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    Convenience wrapper for <a class="reference internal nimdoc" title="proc flag(short: char; name, help: static string; handler: FlagHandler)" href="#flag,char,staticstring,staticstring,FlagHandler">flag</a>.
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L612" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L612" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -1130,26 +1161,26 @@ Options:
 </div>
 <div id="help-templates-all">
   <div id="help.t,CliHelp[Tag,Id],string">
-  <dt><pre><span class="Keyword">template</span> <a href="#help.t%2CCliHelp%5BTag%2CId%5D%2Cstring"><span class="Identifier">help</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">:</span> <span class="Identifier">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">token</span><span class="Other">:</span> <a href="#CliHelp"><span class="Identifier">CliHelp</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">,</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span> <span class="Other">=</span> <span class="StringLit">&quot;&quot;</span><span class="Other">)</span><span class="Other">:</span> <a href="#HelpView"><span class="Identifier">HelpView</span></a><span class="Other">[</span>
+  <dt><pre><span class="Keyword">template</span> <a href="#help.t%2CCliHelp%5BTag%2CId%5D%2Cstring"><span class="Identifier">help</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">token</span><span class="Other">:</span> <a href="#CliHelp"><span class="Identifier">CliHelp</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">,</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span> <span class="Other">=</span> <span class="StringLit">&quot;&quot;</span><span class="Other">)</span><span class="Other">:</span> <a href="#HelpView"><span class="Identifier">HelpView</span></a><span class="Other">[</span>
     <span class="Identifier">Tag</span><span class="Other">,</span> <span class="Identifier">Id</span><span class="Other">]</span></pre></dt>
   <dd>
     
     Returns the <tt class="docutils literal"><span class="pre"><span class="Identifier">HelpView</span></span></tt> for <tt class="docutils literal"><span class="pre"><span class="Identifier">path</span></span></tt> (<tt class="docutils literal"><span class="pre"><span class="StringLit">&quot;&quot;</span></span></tt> = root level). If <tt class="docutils literal"><span class="pre"><span class="Identifier">path</span></span></tt> is not found, returns the root help page. The view carries the token identity so <tt class="docutils literal"><span class="pre"><span class="Operator">$</span></span></tt> and <a class="reference internal nimdoc" title="proc display (2 overloads)" href="#display-procs-all">display</a> apply the registered interpolator automatically.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L508" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L508" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L583" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L583" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
 
 </div>
 <div id="optreg-templates-all">
-  <div id="optreg.t,char,string,string,string,untyped">
-  <dt><pre><span class="Keyword">template</span> <a href="#optreg.t%2Cchar%2Cstring%2Cstring%2Cstring%2Cuntyped"><span class="Identifier">optreg</span></a><span class="Other">(</span><span class="Identifier">short</span><span class="Other">:</span> <span class="Identifier">char</span><span class="Other">;</span> <span class="Identifier">name</span><span class="Other">,</span> <span class="Identifier">help</span><span class="Other">,</span> <span class="Identifier">metavar</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">body</span><span class="Other">:</span> <span class="Identifier">untyped</span><span class="Other">)</span></pre></dt>
+  <div id="optreg.t,char,staticstring,staticstring,staticstring,untyped">
+  <dt><pre><span class="Keyword">template</span> <a href="#optreg.t%2Cchar%2Cstaticstring%2Cstaticstring%2Cstaticstring%2Cuntyped"><span class="Identifier">optreg</span></a><span class="Other">(</span><span class="Identifier">short</span><span class="Other">:</span> <span class="Identifier">char</span><span class="Other">;</span> <span class="Identifier">name</span><span class="Other">,</span> <span class="Identifier">help</span><span class="Other">,</span> <span class="Identifier">metavar</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">body</span><span class="Other">:</span> <span class="Identifier">untyped</span><span class="Other">)</span></pre></dt>
   <dd>
     
-    Convenience wrapper for <a class="reference internal nimdoc" title="proc opt(short: char; name, help, metavar: string; handler: OptHandler)" href="#opt,char,string,string,string,OptHandler">opt</a>. Injects <tt class="docutils literal"><span class="pre"><span class="Identifier">val</span></span></tt> for the parsed value.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L526" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L526" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    Convenience wrapper for <a class="reference internal nimdoc" title="proc opt(short: char; name, help, metavar: static string; handler: OptHandler)" href="#opt,char,staticstring,staticstring,staticstring,OptHandler">opt</a>. Injects <tt class="docutils literal"><span class="pre"><span class="Identifier">val</span></span></tt> for the parsed value.
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L601" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L601" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -1161,8 +1192,8 @@ Options:
   <dd>
     
     Convenience wrapper for <a class="reference internal nimdoc" title="proc run(handler: CmdRunHandler)" href="#run,CmdRunHandler">run</a>.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L559" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L559" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L634" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L634" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -1170,14 +1201,14 @@ Options:
 </div>
 <div id="setHelpInterpolator-templates-all">
   <div id="setHelpInterpolator.t,CliHelp[Tag,Id],untyped">
-  <dt><pre><span class="Keyword">template</span> <a href="#setHelpInterpolator.t%2CCliHelp%5BTag%2CId%5D%2Cuntyped"><span class="Identifier">setHelpInterpolator</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">:</span> <span class="Identifier">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">token</span><span class="Other">:</span> <a href="#CliHelp"><span class="Identifier">CliHelp</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">,</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">;</span>
+  <dt><pre><span class="Keyword">template</span> <a href="#setHelpInterpolator.t%2CCliHelp%5BTag%2CId%5D%2Cuntyped"><span class="Identifier">setHelpInterpolator</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">:</span> <span class="Keyword">static</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">token</span><span class="Other">:</span> <a href="#CliHelp"><span class="Identifier">CliHelp</span></a><span class="Other">[</span><span class="Identifier">Tag</span><span class="Other">,</span> <span class="Identifier">Id</span><span class="Other">]</span><span class="Other">;</span>
     <span class="Identifier">body</span><span class="Other">:</span> <span class="Identifier">untyped</span><span class="Other">)</span></pre></dt>
   <dd>
     
     Convenience wrapper for <a class="reference internal nimdoc" title="proc helpInterpolator[Tag: static string; Id](token: CliHelp[Tag, Id];
     handler: proc (s: string): string)" href="#helpInterpolator,CliHelp[Tag,Id],proc(string)">helpInterpolator</a>. Injects <tt class="docutils literal"><span class="pre"><span class="Identifier">s</span></span></tt> for the closure's string parameter.
-    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L598" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L598" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/indiscipline/cozycliparser/tree/main/cozycliparser.nim#L673" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/indiscipline/cozycliparser/edit/devel/cozycliparser.nim#L673" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -1193,7 +1224,7 @@ Options:
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2026-03-19 14:27:22 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2026-04-05 13:29:19 UTC</small>
       </div>
     </div>
   </div>
