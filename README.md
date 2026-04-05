@@ -78,7 +78,7 @@ buildParser(parserConfig(helpPrefix = "Greeter v0.1\nThis program greets."),
 doAssert $Cli.help == """Greeter v0.1
 This program greets.
 
-Usage: greeter [options] INPUT <greet> <version>
+Usage: greeter [options] INPUT <greet|version>
 
 Arguments:
   INPUT  Input file

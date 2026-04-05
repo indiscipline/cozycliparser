@@ -337,6 +337,55 @@ runnableExamples("-r:off"):
 ## There is one `onError` handler per parser; `e.path` and `e.help`
 ## distinguish which level triggered the error.
 ##
+## Sharing registration logic
+## --------------------------
+##
+## When multiple subcommands share the same set of sub-options, flags, or
+## nested commands, you can avoid repetition by declaring the shared
+## registrations in a template or proc and calling it inside each `cmd`
+## closure.
+##
+## **Template** - expanded at each call site, so any captured variables are
+## substituted as literals. The compiler sees the expanded registration calls
+## directly, which means help text expressions can reference the template
+## parameters freely:
+##
+runnableExamples("-r:off"):
+  var currentService: string
+
+  template registerActions(svc: static string) =
+    cmd("start", "Start " & svc) do ():
+      run do (): currentService = svc
+    cmd("stop",  "Stop "  & svc) do ():
+      run do (): currentService = svc
+
+  buildParser("svcctl", "Cli", GnuMode):
+    cmd("nginx",    "Manage nginx")    do (): registerActions("nginx")
+    cmd("postgres", "Manage postgres") do (): registerActions("postgres")
+##
+## **Proc** - the body is traversed at compile time so the macro sees
+## the nested registrations for help generation. This produces slightly
+## less code (the proc is not inlined but called at runtime), but unique
+## handling closures are instantiated for each use of `registerActions` in
+## both cases.
+##
+runnableExamples("-r:off"):
+  var currentService: string
+
+  proc registerActions(svc: string) =
+    cmd("start", "Start the service") do ():
+      run do (): currentService = svc
+    cmd("stop",  "Stop the service")  do ():
+      run do (): currentService = svc
+
+  buildParser("svcctl", "Cli", GnuMode):
+    cmd("nginx",    "Manage nginx")    do (): registerActions("nginx")
+    cmd("postgres", "Manage postgres") do (): registerActions("postgres")
+##
+## The proc/template bodies must contain only registration calls (`opt`_,
+## `flag`_, `arg`_, `run`_, `cmd`_). Any other statement is a compile-time
+## error.
+##
 ## Principle of operation
 ## ----------------------
 ##
@@ -517,34 +566,34 @@ var bpActive* {.threadvar.}: BpContext
   ## Scratch context written by registration procs during `buildParser` body
   ## execution. Committed into `bpStorage` by the macro after the body runs.
 
-proc opt*(short: char; name, help, metavar: string; handler: OptHandler) =
+proc opt*(short: char; name, help, metavar: static string; handler: OptHandler) =
   ## Registers a key-value option (`--name=val` / `-s val`).
   ## Pass `'\0'` for `short` to omit the short form; `""` for `name` to omit
   ## the long form. `metavar` is the value placeholder in usage lines.
   bpActive.handlers.add Handler(kind: okOpt, onOpt: handler)
 
-template optreg*(short: char; name, help, metavar: string; body: untyped) =
+template optreg*(short: char; name, help, metavar: static string; body: untyped) =
   ## Convenience wrapper for `opt`_. Injects `val` for the parsed value.
   opt(short, name, help, metavar, proc(val {.inject.}: string) = body)
 
-proc flag*(short: char; name, help: string; handler: FlagHandler) =
+proc flag*(short: char; name, help: static string; handler: FlagHandler) =
   ## Registers a boolean flag (`--name` / `-s`), fired with no value.
   ##
   ## Pass `'\0'` for `short` to omit the short form; `""` for `name` to omit
   ## the long form.
   bpActive.handlers.add Handler(kind: okFlag, onFlag: handler)
 
-template flagreg*(short: char; name, help: string; body: untyped) =
+template flagreg*(short: char; name, help: static string; body: untyped) =
   ## Convenience wrapper for `flag`_.
   flag(short, name, help, proc() = body)
 
-proc arg*(name, help: string; handler: ArgHandler) =
+proc arg*(name, help: static string; handler: ArgHandler) =
   ## Registers a positional argument handler. Multiple `arg` calls are allowed
   ## per parser level. Tokens are dispatched in registration order; the last
   ## handler absorbs overflow.
   bpActive.handlers.add Handler(kind: okArg, onArg: handler)
 
-template argreg*(name, help: string; body: untyped) =
+template argreg*(name, help: static string; body: untyped) =
   ## Convenience wrapper for `arg`_. Injects `key` for the parsed argument.
   arg(name, help, proc(key {.inject.}: string) = body)
 
@@ -560,7 +609,7 @@ template runreg*(body: untyped) =
   ## Convenience wrapper for `run`_.
   run(proc() = body)
 
-proc cmd*(name, help: string; cmdRegistrations: proc()) =
+proc cmd*(name, help: static string; cmdRegistrations: proc()) =
   ## Declares a subcommand. `cmdRegistrations` is called immediately to
   ## register the subcommand's own options, flags, args and nested commands,
   ## not when the command is met during parsing.
@@ -576,7 +625,7 @@ proc cmd*(name, help: string; cmdRegistrations: proc()) =
   # to the generated `<name>Cmd(remainingArgs)` proc with its own parser loop.
   cmdRegistrations()
 
-template command*(name, help: string; body: untyped) =
+template command*(name, help: static string; body: untyped) =
   ## Convenience wrapper for `cmd`_.
   cmd(name, help, proc() = body)
 
@@ -668,6 +717,7 @@ type
     name: string
     help: string
     scope: Scope
+    dispatchSym: NimNode  ## gensym'd proc name; set during extractScope
 
   Scope = ref object
     ## Compile-time metadata for one parser level (root or subcommand).
@@ -756,9 +806,11 @@ func generateHelp(prefix, progName: string; specs: openArray[OptSpec];
   for r in argRows:
     result.plain(" ")
     result.addSpan(htArg, r.name)
-  for c in cmds:
+  if cmds.len > 0:
     result.plain(" <")
-    result.addSpan(htSubCmd, c.name)
+    for i, c in cmds:
+      if i > 0: result.plain("|")
+      result.addSpan(htSubCmd, c.name)
     result.plain(">")
 
   proc section(d: var HelpText; label: string; rows: seq[Row];
@@ -815,83 +867,99 @@ proc extractScope(progName: string; body: NimNode; cfg: ParserConfig;
   var scope = Scope(progName: progName, path: path)
   var next = 0
 
-  var stmts: seq[NimNode]
-  let bodyStmts = # wrapping a single-call body for uniformity
-    if body.kind == nnkStmtList: body
-    else: newTree(nnkStmtList, body)
-  for s in bodyStmts:
-    if s.kind == nnkStmtList:
-      for inner in s: stmts.add inner
-    else: stmts.add s
-
   let (hShort, hLong) = cfg.helpFlag
   var shortOverridden, longOverridden = false
   var conflictNode: NimNode
 
-  for stmt in stmts:
-    if stmt.kind in {nnkCommentStmt, nnkEmpty, nnkMixinStmt}: continue
-    if stmt.kind == nnkBlockStmt: continue  ## explicit escape hatch
-    if stmt.kind notin {nnkCall, nnkCommand}:
-      error("buildParser: only opt, flag, arg, run, cmd calls are allowed " &
-            "in the parser body; use a bare `block:` for other statements", stmt)
-    let callee = $stmt[0]
-    case callee
-    of "helpInterpolator": continue
-    of "opt", "flag":
-      let isOpt = callee == "opt"
-      let spec = OptSpec(
-        kind: if isOpt: okOpt else: okFlag,
-        short: chr(stmt[1].intVal.uint8),
-        name: stmt[2].strArgVal(),
-        help: stmt[3].strArgVal(),
-        metavar: if isOpt: stmt[4].strArgVal() else: "",
-        absIdx: baseIdx + next)
-      if not spec.hasShort and not spec.hasLong:
-        error(callee & ": must have at least one of short or long form", stmt)
-      if cfg.helpAuto:
-        if spec.hasShort and keyOk(hShort) and spec.short == hShort:
-          shortOverridden = true
-          if conflictNode == nil: conflictNode = stmt
-        if spec.hasLong and keyOk(hLong) and spec.name == hLong:
-          longOverridden = true
-          if conflictNode == nil: conflictNode = stmt
-      scope.specs.add spec
-      inc next
-    of "arg":
-      let absIdx = baseIdx + next
-      scope.argIdxs.add absIdx
-      scope.specs.add OptSpec(kind: okArg, name: stmt[1].strArgVal(),
-                              help: stmt[2].strArgVal(), absIdx: absIdx)
-      inc next
-    of "run":
-      if scope.runIdx >= 0:
-        error("run: only one `run` handler allowed per parser level", stmt)
-      scope.runIdx = baseIdx + next
-      scope.specs.add OptSpec(kind: okRun, absIdx: baseIdx + next)
-      inc next
-    of "cmd":
-      let
-        name = stmt[1].strArgVal()
-        cmdHelp = stmt[2].strArgVal()
-        rawClosure = stmt[^1]
-        lambdaNode =
-          case rawClosure.kind
-          of nnkHiddenStdConv: rawClosure[^1]
-          of nnkLambda, nnkProcDef: rawClosure
-          else: rawClosure
-      let cmdBody = block:
-        let raw = lambdaNode[^1]
-        if raw.kind == nnkStmtList: raw
-        else: newTree(nnkStmtList, raw)
-      let (childScope, childSize) =
-        extractScope(progName, cmdBody, cfg,
-                     (if path.len > 0: path & " " & name else: name), baseIdx + next)
-      next.inc childSize
-      scope.cmds.add CmdSpec(name: name, help: cmdHelp, scope: childScope)
-    else:
-      error("buildParser: unexpected call '" & callee & "' - only opt, " &
-            "flag, arg, run, cmd and helpInterpolator are allowed " &
-            "directly in the parser body. Use `block:` for other calls", stmt)
+  proc flattenStmts(node: NimNode): seq[NimNode] =
+    let stmtList =
+      if node.kind == nnkStmtList: node
+      else: newTree(nnkStmtList, node)
+    for s in stmtList:
+      if s.kind == nnkStmtList:
+        for inner in s: result.add inner
+      else: result.add s
+
+  proc processStmts(stmts: seq[NimNode]) =
+    for stmt in stmts:
+      if stmt.kind in {nnkCommentStmt, nnkEmpty, nnkMixinStmt}: continue
+      if stmt.kind == nnkBlockStmt: continue  ## explicit escape hatch
+      if stmt.kind notin {nnkCall, nnkCommand}:
+        error("buildParser: only opt, flag, arg, run, cmd calls are allowed " &
+              "in the parser body; use a bare `block:` for other statements", stmt)
+      let callee = $stmt[0]
+      case callee
+      of "helpInterpolator": continue
+      of "opt", "flag":
+        let isOpt = callee == "opt"
+        let spec = OptSpec(
+          kind: if isOpt: okOpt else: okFlag,
+          short: chr(stmt[1].intVal.uint8),
+          name: stmt[2].strArgVal(),
+          help: stmt[3].strArgVal(),
+          metavar: if isOpt: stmt[4].strArgVal() else: "",
+          absIdx: baseIdx + next)
+        if not spec.hasShort and not spec.hasLong:
+          error(callee & ": must have at least one of short or long form", stmt)
+        if cfg.helpAuto:
+          if spec.hasShort and keyOk(hShort) and spec.short == hShort:
+            shortOverridden = true
+            if conflictNode == nil: conflictNode = stmt
+          if spec.hasLong and keyOk(hLong) and spec.name == hLong:
+            longOverridden = true
+            if conflictNode == nil: conflictNode = stmt
+        scope.specs.add spec
+        inc next
+      of "arg":
+        let absIdx = baseIdx + next
+        scope.argIdxs.add absIdx
+        scope.specs.add OptSpec(kind: okArg, name: stmt[1].strArgVal(),
+                                help: stmt[2].strArgVal(), absIdx: absIdx)
+        inc next
+      of "run":
+        if scope.runIdx >= 0:
+          error("run: only one `run` handler allowed per parser level", stmt)
+        scope.runIdx = baseIdx + next
+        scope.specs.add OptSpec(kind: okRun, absIdx: baseIdx + next)
+        inc next
+      of "cmd":
+        let
+          name = stmt[1].strArgVal()
+          cmdHelp = stmt[2].strArgVal()
+          rawClosure = stmt[^1]
+          lambdaNode =
+            case rawClosure.kind
+            of nnkHiddenStdConv: rawClosure[^1]
+            of nnkLambda, nnkProcDef: rawClosure
+            else: rawClosure
+        let cmdBody = block:
+          let raw = lambdaNode[^1]
+          if raw.kind == nnkStmtList: raw
+          else: newTree(nnkStmtList, raw)
+        let (childScope, childSize) =
+          extractScope(progName, cmdBody, cfg,
+                       (if path.len > 0: path & " " & name else: name), baseIdx + next)
+        next.inc childSize
+        scope.cmds.add CmdSpec(name: name, help: cmdHelp, scope: childScope,
+                               dispatchSym: genSym(nskProc, name & "Cmd"))
+      else:
+        # Unknown call: attempt transparent inlining if the callee resolves to
+        # a proc whose body consists entirely of valid registration calls.
+        # This allows parameterised registration procs to be declared once and
+        # shared across multiple cmd closures without duplicating declarations.
+        # Any non-registration statement inside the inlined body produces the
+        # same error as if written directly in the parser body.
+        let impl = if stmt[0].kind == nnkSym: stmt[0].getImpl() else: nil
+        let implBody = if impl != nil and impl.kind in {nnkProcDef, nnkFuncDef}: impl[^1]
+                       else: nil
+        if implBody == nil or implBody.kind == nnkEmpty:
+          error("buildParser: unexpected call '" & callee & "' - only opt, flag, arg, " &
+                "run, cmd and helpInterpolator are allowed directly in the parser body; " &
+                "use a bare `block:` for other statements, or a proc/template containing " &
+                "only registration calls", stmt)
+        processStmts(flattenStmts(implBody))
+
+  processStmts(flattenStmts(body))
 
   scope.bareRun = scope.cmds.len == 0 and scope.argIdxs.len == 0 and
     scope.specs.len == (if scope.runIdx >= 0: 1 else: 0)
@@ -1032,7 +1100,7 @@ proc buildParserLoop(scope: Scope; bx: BCtx;
     if scope.cmds.len > 0:
       let cmdCase = nnkCaseStmt.newTree(key)
       for c in scope.cmds:
-        let procId = ident(c.name & "Cmd")
+        let procId = c.dispatchSym
         let cmdName = newLit(c.name)
         let callNode = newCall(procId,
           newCall(newDotExpr(parser, bindSym"remainingArgs")))
@@ -1079,7 +1147,7 @@ proc generateDispatchers(scope: Scope; bx: BCtx): NimNode =
   result = newStmtList()
   for c in scope.cmds:
     result.add generateDispatchers(c.scope, bx)
-    let procId = ident(c.name & "Cmd")
+    let procId = c.dispatchSym
     let args = ident("args")
     let (loopSetup, loopRunCall) = buildParserLoop(c.scope, bx, args)
     result.add quote do:
@@ -1200,7 +1268,7 @@ template buildParser*(progName, helpName: static string;
 
 when isMainModule:
   const
-    HelpRoot = """Usage: csvtool [options] <filter> <version>
+    HelpRoot = """Usage: csvtool [options] <filter|version>
 
 Commands:
   filter   Filter rows by column value
@@ -1261,3 +1329,73 @@ Options:
   doAssert $Cli.help == HelpRoot
   doAssert $Cli.help("filter") == HelpFilter
   showHelp()
+
+  const
+    HelpSvcRoot = """Usage: svcctl [options] <nginx|postgres>
+
+Commands:
+  nginx     Manage nginx
+  postgres  Manage postgres
+
+Options:
+  -h, --help  Show this help and exit"""
+
+    HelpSvcNginx = """Usage: svcctl nginx [options] <start|stop|status>
+
+Commands:
+  start   Start the service
+  stop    Stop the service
+  status  Show service status
+
+Options:
+  -h, --help  Show this help and exit"""
+
+    HelpSvcPostgres = """Usage: svcctl postgres [options] <start|stop|status>
+
+Commands:
+  start   Start the service
+  stop    Stop the service
+  status  Show service status
+
+Options:
+  -h, --help  Show this help and exit"""
+
+  # Shared registration via template: expanded at each call site.
+  block:
+    var lastService, lastAction: string
+
+    template registerActions(svc: string) =
+      cmd("start", "Start the service") do ():
+        run do (): lastService = svc; lastAction = "start"
+      cmd("stop", "Stop the service") do ():
+        run do (): lastService = svc; lastAction = "stop"
+      cmd("status", "Show service status") do ():
+        run do (): lastService = svc; lastAction = "status"
+
+    buildParser("svcctl", "SvcCli", NimMode):
+      cmd("nginx",    "Manage nginx")    do (): registerActions("nginx")
+      cmd("postgres", "Manage postgres") do (): registerActions("postgres")
+
+    doAssert $SvcCli.help == HelpSvcRoot
+    doAssert $SvcCli.help("nginx") == HelpSvcNginx
+    doAssert $SvcCli.help("postgres") == HelpSvcPostgres
+
+  # Shared registration via proc: body scanned by extractScope via getImpl.
+  block:
+    var lastService, lastAction: string
+
+    proc registerActions(svc: string) =
+      cmd("start", "Start the service") do ():
+        run do (): lastService = svc; lastAction = "start"
+      cmd("stop", "Stop the service") do ():
+        run do (): lastService = svc; lastAction = "stop"
+      cmd("status", "Show service status") do ():
+        run do (): lastService = svc; lastAction = "status"
+
+    buildParser("svcctl", "SvcCli", NimMode):
+      cmd("nginx",    "Manage nginx")    do (): registerActions("nginx")
+      cmd("postgres", "Manage postgres") do (): registerActions("postgres")
+
+    doAssert $SvcCli.help == HelpSvcRoot
+    doAssert $SvcCli.help("nginx") == HelpSvcNginx
+    doAssert $SvcCli.help("postgres") == HelpSvcPostgres
