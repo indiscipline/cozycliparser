@@ -18,10 +18,8 @@ from a set of regular, fully type-checked procedure calls and option-handling cl
 
 ## Installation
 
-**Relies on Nim devel** (>=2.3.1) due to using
-[recent](https://github.com/nim-lang/Nim/pull/25506) `std/parseopt` changes.
-Up-to-date Nimble should be able to install development nim with
-`nimble install nim@#devel`.
+Requires Nim >= 2.2.10 due to using 
+[recent](https://github.com/nim-lang/Nim/pull/25506) `std/parseopt` improvements.
 
 Cozy CLI Parser is in the [nimble directory](https://nimble.directory/pkg/cozycliparser), use
 `atlas` or `nimble` to install:

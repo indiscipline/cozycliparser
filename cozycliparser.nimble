@@ -1,5 +1,5 @@
 # Package
-version       = "0.3.2"
+version       = "0.3.3"
 author        = "Kirill I."
 description   = "CLI parser builder, a convenience wrapper over `std/parseopt`"
 license       = "GPL-2.0-or-later"
@@ -7,7 +7,7 @@ srcDir        = "."
 
 # Dependencies
 
-requires "nim >= 2.3.1"
+requires "nim >= 2.2.10"
 
 import std/[pegs, os, strutils]
 
